@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="common_lib_wifi_debugger" targetName="Production" />
+      <config projectName="common_lib_wifi_debugger" targetName="Debug" />
+      <config projectName="common_lib_wifi_debugger" targetName="Z_DUMMY_TARGET" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="esp32dev" CONFIG_NAME="esp32dev" ENABLED="true" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="444d4358-4ec7-4add-ae60-b4f591444760" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/untitled.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/common_lib_wifi_debugger.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/.sconsign37.dblite" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/.sconsign37.dblite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/firmware.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/firmware.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/firmware.elf" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/firmware.elf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib2cb/HTTPUpdate/HTTPUpdate.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib2cb/HTTPUpdate/HTTPUpdate.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib2cb/libHTTPUpdate.a" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib2cb/libHTTPUpdate.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/ETH.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/ETH.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFi.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFi.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiAP.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiAP.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiClient.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiClient.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiGeneric.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiGeneric.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiMulti.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiMulti.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiSTA.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiSTA.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiScan.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiScan.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiServer.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiServer.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiUdp.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/WiFi/WiFiUdp.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/libWiFi.a" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib317/libWiFi.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib9e3/WiFiClientSecure/WiFiClientSecure.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib9e3/WiFiClientSecure/WiFiClientSecure.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib9e3/WiFiClientSecure/ssl_client.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib9e3/WiFiClientSecure/ssl_client.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib9e3/libWiFiClientSecure.a" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib9e3/libWiFiClientSecure.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib9fc/HTTPClient/HTTPClient.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib9fc/HTTPClient/HTTPClient.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/lib9fc/libHTTPClient.a" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/lib9fc/libHTTPClient.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/libFrameworkArduino.a" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/libFrameworkArduino.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/libaf4/Update/HttpsOTAUpdate.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/libaf4/Update/HttpsOTAUpdate.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/libaf4/Update/Updater.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/libaf4/Update/Updater.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/libaf4/libUpdate.a" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/libaf4/libUpdate.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pio/build/esp32dev/src/main.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/.pio/build/esp32dev/src/main.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:esp32dev" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="25qRJpsZyewIbHeOoFnPDTGFOW3" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="cmake.loaded.for.project" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/include" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Bibliotheken\Dokumente\Git\common_lib_wifi_debugger\include" />
+    </key>
+  </component>
+  <component name="RunManager" selected="PlatformIO.PlatformIO Upload">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Z_DUMMY_TARGET" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="common_lib_wifi_debugger" TARGET_NAME="Z_DUMMY_TARGET" CONFIG_NAME="esp32dev" RUN_TARGET_PROJECT_NAME="common_lib_wifi_debugger" RUN_TARGET_NAME="Z_DUMMY_TARGET">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PlatformIO Debug" type="platformio" factoryName="PlatformIO Debug" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="common_lib_wifi_debugger" TARGET_NAME="Debug" CONFIG_NAME="esp32dev" RUN_TARGET_PROJECT_NAME="common_lib_wifi_debugger" RUN_TARGET_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PlatformIO Upload" type="platformio" factoryName="PlatformIO Upload" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="common_lib_wifi_debugger" TARGET_NAME="Production" CONFIG_NAME="esp32dev" RUN_TARGET_PROJECT_NAME="common_lib_wifi_debugger" RUN_TARGET_NAME="Production">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.Z_DUMMY_TARGET" />
+      <item itemvalue="PlatformIO.PlatformIO Debug" />
+      <item itemvalue="PlatformIO.PlatformIO Upload" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="444d4358-4ec7-4add-ae60-b4f591444760" name="Default Changelist" comment="" />
+      <created>1646252561260</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1646252561260</updated>
+      <workItem from="1646252562749" duration="942000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

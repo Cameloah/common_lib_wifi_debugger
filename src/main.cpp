@@ -5,15 +5,15 @@
 #include <WiFiClientSecure.h>
 #include "cert.h"
 
-const char * ssid = "Free WIFI2.4";
+const char * ssid = "Free WiFi2.4";
 const char * password = "IschMirDochGlich1";
 
 
 String FirmwareVer = {
         "2.2"
 };
-#define URL_fw_Version "https://raw.githubusercontent.com/programmer131/ESP8266_ESP32_SelfUpdate/master/esp32_ota/bin_version.txt"
-#define URL_fw_Bin "https://raw.githubusercontent.com/programmer131/ESP8266_ESP32_SelfUpdate/master/esp32_ota/fw.bin"
+#define URL_fw_Version "https://github.com/Cameloah/common_lib_wifi_debugger/blob/master/bin_version.txt"
+#define URL_fw_Bin "https://github.com/Cameloah/common_lib_wifi_debugger/blob/master/.pio/build/esp32dev/firmware.bin"
 
 //#define URL_fw_Version "http://cade-make.000webhostapp.com/version.txt"
 //#define URL_fw_Bin "http://cade-make.000webhostapp.com/firmware.bin"
@@ -87,6 +87,7 @@ void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
     connect_wifi();
 }
+
 void loop() {
     if (button_boot.pressed) { //to connect wifi via Android esp touch app
         Serial.println("Firmware update Starting..");
