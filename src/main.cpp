@@ -5,9 +5,11 @@
 #include <WiFiClientSecure.h>
 #include "cert.h"
 
-const char * ssid = "Free WiFi2.4";
-const char * password = "IschMirDochGlich1";
+const char* ssid = "";
+const char* password = "";
 
+const char* url_fw_version = "";
+const char* url_fw_bin = "";
 
 String FirmwareVer = {
         "2.2"
@@ -78,7 +80,13 @@ void IRAM_ATTR isr() {
 }
 
 
-void setup() {
+void wifi_debugger_init(const char* user_ssid, const char* user_password, const char* user_url_fw_version, const char* user_url_fw_bin) {
+    // get all the user data first
+    ssid = user_ssid;
+    password = user_password;
+    url_fw_version = user_url_fw_version;
+    url_fw_bin = user_url_fw_bin;
+
     pinMode(button_boot.PIN, INPUT);
     attachInterrupt(button_boot.PIN, isr, RISING);
     Serial.begin(115200);
@@ -88,7 +96,7 @@ void setup() {
     connect_wifi();
 }
 
-void loop() {
+void wifi_debugger_update() {
     if (button_boot.pressed) { //to connect wifi via Android esp touch app
         Serial.println("Firmware update Starting..");
         firmwareUpdate();
