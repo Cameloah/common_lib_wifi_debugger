@@ -6,8 +6,8 @@
 #include "cert.h"
 #include "wifi_debugger.h"
 
-const char* ssid = "";
-const char* password = "";
+char ssid[50] = "hello_world";
+char password[50] = "admin";
 
 const char* url_fw_version = "";
 const char* url_fw_bin = "";
@@ -70,52 +70,38 @@ Button button_boot = {
     s->pressed = true;
 }*/
 
-void IRAM_ATTR isr() {
-    button_boot.numberKeyPresses += 1;
-    button_boot.pressed = true;
-}
 
 
-void wifi_debugger_init(const char* user_ssid, const char* user_password, const char* user_url_fw_version, const char* user_url_fw_bin) {
+
+void wifi_debugger_init(const char* user_ssid, const char* user_password) {
     // get all the user data first
-    ssid = user_ssid;
-    password = user_password;
-    url_fw_version = user_url_fw_version;
-    url_fw_bin = user_url_fw_bin;
 
-    pinMode(button_boot.PIN, INPUT);
-    attachInterrupt(button_boot.PIN, isr, RISING);
     Serial.print("Active firmware version:");
     Serial.println(FirmwareVer);
     connect_wifi();
 }
 
 void wifi_debugger_update() {
-    if (button_boot.pressed) { //to connect wifi via Android esp touch app
-        Serial.println("Firmware update Starting..");
-        wifi_debugger_firmwareUpdate();
-        button_boot.pressed = false;
-    }
     repeatedCall();
 }
 
 int timer_wifi_connect = 0;
 void connect_wifi() {
-    Serial.println("Waiting for WiFi");
+    Serial.println("Warte auf WiFi");
     WiFi.begin(ssid, password);
     while ((WiFi.status() != WL_CONNECTED)) {
         delay(500);
         Serial.print(".");
         timer_wifi_connect++;
         if(timer_wifi_connect > 10) {
-            Serial.println("Wifi timeout.");
+            Serial.println("Gespeichertes WiFi nicht gefunden.");
             return;
         }
     }
 
     Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
+    Serial.println("WiFi verbunden");
+    Serial.println("IP-Addresse: ");
     Serial.println(WiFi.localIP());
 }
 
@@ -127,7 +113,7 @@ void wifi_debugger_firmwareUpdate(void) {
 
     switch (ret) {
         case HTTP_UPDATE_FAILED:
-            Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+            Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
             break;
 
         case HTTP_UPDATE_NO_UPDATES:
