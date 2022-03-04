@@ -4,6 +4,7 @@
 #include <HTTPUpdate.h>
 #include <WiFiClientSecure.h>
 #include "cert.h"
+#include "wifi_debugger.h"
 
 const char* ssid = "";
 const char* password = "";
@@ -20,11 +21,6 @@ String FirmwareVer = {
 //#define URL_fw_Version "http://cade-make.000webhostapp.com/version.txt"
 //#define URL_fw_Bin "http://cade-make.000webhostapp.com/firmware.bin"
 
-#define LED_BUILTIN             2
-
-void connect_wifi();
-void firmwareUpdate();
-int FirmwareVersionCheck();
 
 unsigned long previousMillis = 0; // will store last time LED was updated
 unsigned long previousMillis_2 = 0;
@@ -36,8 +32,8 @@ void repeatedCall() {
     if ((currentMillis - previousMillis) >= interval) {
         // save the last time you blinked the LED
         previousMillis = currentMillis;
-        if (FirmwareVersionCheck()) {
-            firmwareUpdate();
+        if (wifi_debugger_fwVersionCheck()) {
+            wifi_debugger_firmwareUpdate();
         }
     }
     if ((currentMillis - previousMillis_2) >= mini_interval) {
@@ -89,28 +85,32 @@ void wifi_debugger_init(const char* user_ssid, const char* user_password, const 
 
     pinMode(button_boot.PIN, INPUT);
     attachInterrupt(button_boot.PIN, isr, RISING);
-    Serial.begin(115200);
     Serial.print("Active firmware version:");
     Serial.println(FirmwareVer);
-    pinMode(LED_BUILTIN, OUTPUT);
     connect_wifi();
 }
 
 void wifi_debugger_update() {
     if (button_boot.pressed) { //to connect wifi via Android esp touch app
         Serial.println("Firmware update Starting..");
-        firmwareUpdate();
+        wifi_debugger_firmwareUpdate();
         button_boot.pressed = false;
     }
     repeatedCall();
 }
 
+int timer_wifi_connect = 0;
 void connect_wifi() {
     Serial.println("Waiting for WiFi");
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
+    while ((WiFi.status() != WL_CONNECTED)) {
         delay(500);
         Serial.print(".");
+        timer_wifi_connect++;
+        if(timer_wifi_connect > 10) {
+            Serial.println("Wifi timeout.");
+            return;
+        }
     }
 
     Serial.println("");
@@ -120,10 +120,9 @@ void connect_wifi() {
 }
 
 
-void firmwareUpdate(void) {
+void wifi_debugger_firmwareUpdate(void) {
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
-    httpUpdate.setLedPin(LED_BUILTIN, LOW);
     t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
 
     switch (ret) {
@@ -140,7 +139,13 @@ void firmwareUpdate(void) {
             break;
     }
 }
-int FirmwareVersionCheck(void) {
+int wifi_debugger_fwVersionCheck(void) {
+    // if wifi not connected, cancel early
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Wifi is not connected");
+        return 0;
+    }
+
     String payload;
     int httpCode;
     String fwurl = "";
