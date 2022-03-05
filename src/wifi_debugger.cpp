@@ -14,9 +14,6 @@ String FirmwareVer = {
 };
 
 
-
-
-
 void wifi_debugger_init(const char* user_ssid, const char* user_password, const char* url_version, const char* url_bin) {
     // get all the user data first
     strcpy(url_fw_version, url_version);
