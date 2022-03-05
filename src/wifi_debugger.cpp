@@ -6,94 +6,38 @@
 #include "cert.h"
 #include "wifi_debugger.h"
 
-char ssid[50] = "hello_world";
-char password[50] = "admin";
-
-const char* url_fw_version = "";
-const char* url_fw_bin = "";
+char url_fw_version[200] = "";
+char url_fw_bin[200] = "";
 
 String FirmwareVer = {
         "2.2"
 };
-#define URL_fw_Version "https://github.com/Cameloah/common_lib_wifi_debugger/blob/master/bin_version.txt"
-#define URL_fw_Bin "https://github.com/Cameloah/common_lib_wifi_debugger/blob/master/.pio/build/esp32dev/firmware.bin"
-
-//#define URL_fw_Version "http://cade-make.000webhostapp.com/version.txt"
-//#define URL_fw_Bin "http://cade-make.000webhostapp.com/firmware.bin"
-
-
-unsigned long previousMillis = 0; // will store last time LED was updated
-unsigned long previousMillis_2 = 0;
-const long interval = 60000;
-const long mini_interval = 1000;
-void repeatedCall() {
-    static int num=0;
-    unsigned long currentMillis = millis();
-    if ((currentMillis - previousMillis) >= interval) {
-        // save the last time you blinked the LED
-        previousMillis = currentMillis;
-        if (wifi_debugger_fwVersionCheck()) {
-            wifi_debugger_firmwareUpdate();
-        }
-    }
-    if ((currentMillis - previousMillis_2) >= mini_interval) {
-        previousMillis_2 = currentMillis;
-        Serial.print("idle loop...");
-        Serial.print(num++);
-        Serial.print(" Active fw version:");
-        Serial.println(FirmwareVer);
-        if(WiFi.status() == WL_CONNECTED)
-        {
-            Serial.println("wifi connected");
-        }
-        else
-        {
-            connect_wifi();
-        }
-    }
-}
-
-struct Button {
-    const uint8_t PIN;
-    uint32_t numberKeyPresses;
-    bool pressed;
-};
-
-Button button_boot = {
-        0,
-        0,
-        false
-};
-/*void IRAM_ATTR isr(void* arg) {
-    Button* s = static_cast<Button*>(arg);
-    s->numberKeyPresses += 1;
-    s->pressed = true;
-}*/
 
 
 
 
-void wifi_debugger_init(const char* user_ssid, const char* user_password) {
+
+void wifi_debugger_init(const char* user_ssid, const char* user_password, const char* url_version, const char* url_bin) {
     // get all the user data first
-
+    strcpy(url_fw_version, url_version);
+    strcpy(url_fw_bin, url_bin);
     Serial.print("Active firmware version:");
     Serial.println(FirmwareVer);
-    connect_wifi();
+    connect_wifi(user_ssid, user_password);
 }
 
 void wifi_debugger_update() {
-    repeatedCall();
 }
 
 int timer_wifi_connect = 0;
-void connect_wifi() {
+void connect_wifi(const char* ssid, const char* password) {
     Serial.println("Warte auf WiFi");
     WiFi.begin(ssid, password);
     while ((WiFi.status() != WL_CONNECTED)) {
         delay(500);
         Serial.print(".");
         timer_wifi_connect++;
-        if(timer_wifi_connect > 10) {
+        if(timer_wifi_connect > 60) {
             Serial.println("Gespeichertes WiFi nicht gefunden.");
             return;
         }
@@ -109,7 +53,7 @@ void connect_wifi() {
 void wifi_debugger_firmwareUpdate(void) {
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
-    t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
+    t_httpUpdate_return ret = httpUpdate.update(client, "https://github.com/Cameloah/Kraeng-o-meter/blob/master/.pio/build/esp32dev/firmware.bin");
 
     switch (ret) {
         case HTTP_UPDATE_FAILED:
@@ -135,7 +79,7 @@ int wifi_debugger_fwVersionCheck(void) {
     String payload;
     int httpCode;
     String fwurl = "";
-    fwurl += URL_fw_Version;
+    fwurl += "https://raw.githubusercontent.com/Cameloah/Kraeng-o-meter/master/bin_version.txt";
     fwurl += "?";
     fwurl += String(rand());
     Serial.println(fwurl);
@@ -170,6 +114,7 @@ int wifi_debugger_fwVersionCheck(void) {
     if (httpCode == HTTP_CODE_OK) // if version received
     {
         payload.trim();
+        Serial.print("Firmware from Payload:");
         if (payload.equals(FirmwareVer)) {
             Serial.printf("\nDevice already on latest firmware version:%s\n", FirmwareVer.c_str());
             return 0;
