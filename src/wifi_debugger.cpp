@@ -50,6 +50,7 @@ void connect_wifi(const char* ssid, const char* password) {
 void wifi_debugger_firmwareUpdate(void) {
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
+    httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     t_httpUpdate_return ret = httpUpdate.update(client, "https://github.com/Cameloah/Kraeng-o-meter/releases/download/v1.0.1/kraengometer_v1_0_1.bin");
 
     switch (ret) {
@@ -96,7 +97,7 @@ int wifi_debugger_fwVersionCheck(void) {
             delay(100);
             httpCode = https.GET();
             delay(100);
-            if (httpCode == HTTP_CODE_FOUND) // if version received
+            if (httpCode == HTTP_CODE_OK) // if version received
             {
                 payload = https.getString(); // save received version
             } else {
