@@ -10,7 +10,7 @@ char url_fw_version[200] = "";
 char url_fw_bin[200] = "";
 
 String FirmwareVer = {
-        "2.2"
+        "2.1"
 };
 
 
@@ -50,7 +50,7 @@ void connect_wifi(const char* ssid, const char* password) {
 void wifi_debugger_firmwareUpdate(void) {
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
-    t_httpUpdate_return ret = httpUpdate.update(client, "https://github.com/Cameloah/Kraeng-o-meter/blob/master/.pio/build/esp32dev/firmware.bin");
+    t_httpUpdate_return ret = httpUpdate.update(client, "https://github.com/Cameloah/Kraeng-o-meter/releases/download/v1.0.1/kraengometer_v1_0_1.bin");
 
     switch (ret) {
         case HTTP_UPDATE_FAILED:
@@ -96,7 +96,7 @@ int wifi_debugger_fwVersionCheck(void) {
             delay(100);
             httpCode = https.GET();
             delay(100);
-            if (httpCode == HTTP_CODE_OK) // if version received
+            if (httpCode == HTTP_CODE_FOUND) // if version received
             {
                 payload = https.getString(); // save received version
             } else {
@@ -111,6 +111,7 @@ int wifi_debugger_fwVersionCheck(void) {
     if (httpCode == HTTP_CODE_OK) // if version received
     {
         payload.trim();
+
         Serial.print("Firmware from Payload:");
         if (payload.equals(FirmwareVer)) {
             Serial.printf("\nDevice already on latest firmware version:%s\n", FirmwareVer.c_str());
