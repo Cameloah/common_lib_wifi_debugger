@@ -48,6 +48,7 @@ void wifi_debugger_firmwareUpdate(void) {
     // github redirects you to the lastest version if you access ...\latest
     httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     // lets update the given fw binary url with the latest version
+    // TODO: check for proper format of url
     url_fw_bin.replace("<version>", fw_version);
     Serial.printf("\nDownloading and installing Firmware Version %s...\n", fw_version.c_str());
     t_httpUpdate_return ret = httpUpdate.update(client, url_fw_bin);
@@ -66,6 +67,12 @@ void wifi_debugger_firmwareUpdate(void) {
             Serial.println("HTTP_UPDATE_OK");
             break;
     }
+}
+
+void wifi_debugger_firmwareUpdate(const char *desired_version) {
+    // TODO: check for proper format
+    fw_version = desired_version;
+    wifi_debugger_firmwareUpdate();
 }
 
 int wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
@@ -125,7 +132,7 @@ int wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_
             Serial.printf("\nNew Firmware detected! New Patch available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
         } else {
-            Serial.printf("\nDevice already on latest or newer firmware version: v%d.%d.%d\n",
+            Serial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
                           fw_major, fw_minor, fw_patch);
             return 0;
         }
