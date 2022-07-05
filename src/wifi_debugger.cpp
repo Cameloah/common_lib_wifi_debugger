@@ -11,17 +11,16 @@ char url_fw_version[200] = "";
 String url_fw_bin;
 String fw_version;
 
-void
-wifi_debugger_init(const char *user_ssid, const char *user_password, const char *url_version, const char *url_bin) {
+WIFI_DEBUGGER_ERROR_t wifi_debugger_init(const char *user_ssid, const char *user_password, const char *url_version, const char *url_bin) {
     // get all the user data first
     strcpy(url_fw_version, url_version);
     url_fw_bin = url_bin;
-    connect_wifi(user_ssid, user_password);
+    return connect_wifi(user_ssid, user_password);
 }
 
 int timer_wifi_connect = 0;
 
-void connect_wifi(const char *ssid, const char *password) {
+WIFI_DEBUGGER_ERROR_t connect_wifi(const char *ssid, const char *password) {
     Serial.println("Warte auf WiFi");
     WiFi.begin(ssid, password);
     while ((WiFi.status() != WL_CONNECTED)) {
@@ -30,7 +29,7 @@ void connect_wifi(const char *ssid, const char *password) {
         timer_wifi_connect++;
         if (timer_wifi_connect > 60) {
             Serial.println("Gespeichertes WiFi nicht gefunden.");
-            return;
+            return WIFI_DEBUGGER_ERROR_WIFI;
         }
     }
 
@@ -38,10 +37,12 @@ void connect_wifi(const char *ssid, const char *password) {
     Serial.println("WiFi verbunden");
     Serial.println("IP-Addresse: ");
     Serial.println(WiFi.localIP());
+
+    return WIFI_DEBUGGER_ERROR_NO_ERROR;
 }
 
 
-void wifi_debugger_firmwareUpdate(void) {
+WIFI_DEBUGGER_ERROR_t wifi_debugger_firmwareUpdate(void) {
     // initiate wifi update client
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
@@ -57,29 +58,29 @@ void wifi_debugger_firmwareUpdate(void) {
         case HTTP_UPDATE_FAILED:
             Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", httpUpdate.getLastError(),
                           httpUpdate.getLastErrorString().c_str());
-            break;
+            return WIFI_DEBUGGER_ERROR_HTTP;
 
         case HTTP_UPDATE_NO_UPDATES:
             Serial.println("HTTP_UPDATE_NO_UPDATES");
-            break;
+            return WIFI_DEBUGGER_ERROR_NO_UPDATE;
 
         case HTTP_UPDATE_OK:
             Serial.println("HTTP_UPDATE_OK");
-            break;
+            return WIFI_DEBUGGER_ERROR_NO_ERROR;
     }
 }
 
-void wifi_debugger_firmwareUpdate(const char *desired_version) {
+WIFI_DEBUGGER_ERROR_t wifi_debugger_firmwareUpdate(const char *desired_version) {
     // TODO: check for proper format
     fw_version = desired_version;
-    wifi_debugger_firmwareUpdate();
+    return wifi_debugger_firmwareUpdate();
 }
 
-int wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
+WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
     // if wifi not connected, cancel early
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Wifi is not connected");
-        return 0;
+        return WIFI_DEBUGGER_ERROR_WIFI;
     }
 
     int httpCode;;
@@ -107,6 +108,7 @@ int wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_
             } else {
                 Serial.print("error in downloading version file:");
                 Serial.println(httpCode);
+                return WIFI_DEBUGGER_ERROR_HTTP;
             }
             https.end();
         }
@@ -134,10 +136,9 @@ int wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_
         } else {
             Serial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
                           fw_major, fw_minor, fw_patch);
-            return 0;
+            return WIFI_DEBUGGER_ERROR_NO_UPDATE;
         }
-
-        return 1;
+        return WIFI_DEBUGGER_ERROR_NO_ERROR;
     }
-    return 0;
+    return WIFI_DEBUGGER_ERROR_HTTP;
 }
