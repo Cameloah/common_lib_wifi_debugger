@@ -5,30 +5,54 @@
 #include <WiFiClientSecure.h>
 #include "cert.h"
 #include "wifi_debugger.h"
-// #include "version.h"
+#include "../../../include/tools/loop_timer.h"
 
-char url_fw_version[200] = "";
+String url_fw_version;
 String url_fw_bin;
 String fw_version;
+String ssid;
+String password;
 
-WIFI_DEBUGGER_ERROR_t wifi_debugger_init(const char *user_ssid, const char *user_password, const char *url_version, const char *url_bin) {
+IPAddress local_IP;
+IPAddress gateway;
+IPAddress subnet;
+IPAddress primaryDNS;   //optional
+IPAddress secondaryDNS; //optional
+
+
+WIFI_DEBUGGER_ERROR_t wifi_debugger_init(const char *user_ssid, const char *user_password, const char *user_ip,
+                                         const char *user_gateway, const char *user_subnet, const char *url_version,
+                                         const char *url_bin) {
     // get all the user data first
-    strcpy(url_fw_version, url_version);
+    local_IP.fromString(user_ip);
+    gateway.fromString(user_gateway);
+    subnet.fromString(user_subnet);
+
+    url_fw_version = url_version;
     url_fw_bin = url_bin;
-    return connect_wifi(user_ssid, user_password);
+    ssid = user_ssid;
+    password = user_password;
+    return connect_wifi();
 }
 
 int timer_wifi_connect = 0;
 
-WIFI_DEBUGGER_ERROR_t connect_wifi(const char *ssid, const char *password) {
+WIFI_DEBUGGER_ERROR_t connect_wifi() {
     Serial.println("Warte auf WiFi");
-    WiFi.begin(ssid, password);
+
+#ifdef SYS_CONTROL_STAT_IP
+    if (!WiFi.config(local_IP, gateway, subnet)) {
+        Serial.println("STA Failed to configure");
+    }
+#endif
+
+    WiFi.begin(ssid.c_str(), password.c_str());
     while ((WiFi.status() != WL_CONNECTED)) {
         delay(500);
         Serial.print(".");
         timer_wifi_connect++;
-        if (timer_wifi_connect > 60) {
-            Serial.println("Gespeichertes WiFi nicht gefunden.");
+        if (1000 / FREQ_LOOP_CYCLE_HZ * timer_wifi_connect > TIMEOUT_WIFI_CONNECT_MS) {
+            timer_wifi_connect = 0;
             return WIFI_DEBUGGER_ERROR_WIFI;
         }
     }
@@ -40,7 +64,6 @@ WIFI_DEBUGGER_ERROR_t connect_wifi(const char *ssid, const char *password) {
 
     return WIFI_DEBUGGER_ERROR_NO_ERROR;
 }
-
 
 WIFI_DEBUGGER_ERROR_t wifi_debugger_firmwareUpdate(void) {
     // initiate wifi update client
@@ -141,4 +164,8 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_
         return WIFI_DEBUGGER_ERROR_NO_ERROR;
     }
     return WIFI_DEBUGGER_ERROR_HTTP;
+}
+
+bool wifi_debugger_is_connected() {
+    return WiFi.isConnected();
 }
