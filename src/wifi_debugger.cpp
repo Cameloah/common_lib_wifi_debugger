@@ -30,6 +30,10 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_init(const char *user_ssid, const char *user
 
     url_fw_version = url_version;
     url_fw_bin = url_bin;
+
+    Serial.println(url_fw_version);
+    Serial.println(url_fw_bin);
+
     ssid = user_ssid;
     password = user_password;
     return connect_wifi();
@@ -51,7 +55,7 @@ WIFI_DEBUGGER_ERROR_t connect_wifi() {
         delay(500);
         Serial.print(".");
         timer_wifi_connect++;
-        if (1000 / FREQ_LOOP_CYCLE_HZ * timer_wifi_connect > TIMEOUT_WIFI_CONNECT_MS) {
+        if (500 * timer_wifi_connect > TIMEOUT_WIFI_CONNECT_MS) {
             timer_wifi_connect = 0;
             return WIFI_DEBUGGER_ERROR_WIFI;
         }
@@ -114,6 +118,8 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_
 
         // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
         HTTPClient https;
+
+
 
         if (https.begin(*client, url_fw_version)) {
             // start connection and send HTTP header
