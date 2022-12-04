@@ -16,8 +16,8 @@ String password;
 IPAddress local_IP;
 IPAddress gateway;
 IPAddress subnet;
-IPAddress primaryDNS;   //optional
-IPAddress secondaryDNS; //optional
+IPAddress primaryDNS(8, 8, 8, 8); //optional
+IPAddress secondaryDNS(8, 8, 4, 4); //optional
 
 
 WIFI_DEBUGGER_ERROR_t wifi_debugger_init(const char *user_ssid, const char *user_password, const char *user_ip,
@@ -45,7 +45,7 @@ WIFI_DEBUGGER_ERROR_t connect_wifi() {
     Serial.println("Warte auf WiFi");
 
 #ifdef SYS_CONTROL_STAT_IP
-    if (!WiFi.config(local_IP, gateway, subnet)) {
+    if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
         Serial.println("STA Failed to configure");
     }
 #endif
