@@ -46,7 +46,7 @@ WIFI_DEBUGGER_ERROR_t connect_wifi() {
 
 #ifdef SYS_CONTROL_STAT_IP
     if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
-        Serial.println("STA Failed to configure");
+        Serial.println("Static IP failed to configure");
     }
 #endif
 
