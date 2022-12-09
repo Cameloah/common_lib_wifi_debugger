@@ -1,75 +1,29 @@
+//
+// Created by Jo Uni on 08/12/2022.
+//
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <WiFiClientSecure.h>
+
+#include "github_update.h"
 #include "cert.h"
-#include "wifi_debugger.h"
 #include "../../../include/tools/loop_timer.h"
 
 String url_fw_version;
 String url_fw_bin;
 String fw_version;
-String ssid;
-String password;
-
-IPAddress local_IP;
-IPAddress gateway;
-IPAddress subnet;
-IPAddress primaryDNS(8, 8, 8, 8); //optional
-IPAddress secondaryDNS(8, 8, 4, 4); //optional
 
 
-WIFI_DEBUGGER_ERROR_t wifi_debugger_init(const char *user_ssid, const char *user_password, const char *user_ip,
-                                         const char *user_gateway, const char *user_subnet, const char *url_version,
-                                         const char *url_bin) {
-    // get all the user data first
-    local_IP.fromString(user_ip);
-    gateway.fromString(user_gateway);
-    subnet.fromString(user_subnet);
+void github_update_init(const char *url_version, const char *url_bin) {
 
     url_fw_version = url_version;
     url_fw_bin = url_bin;
-
-    Serial.println(url_fw_version);
-    Serial.println(url_fw_bin);
-
-    ssid = user_ssid;
-    password = user_password;
-    return connect_wifi();
 }
 
-int timer_wifi_connect = 0;
-
-WIFI_DEBUGGER_ERROR_t connect_wifi() {
-    Serial.println("Warte auf WiFi");
-
-#ifdef SYS_CONTROL_STAT_IP
-    if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
-        Serial.println("Static IP failed to configure");
-    }
-#endif
-
-    WiFi.begin(ssid.c_str(), password.c_str());
-    while ((WiFi.status() != WL_CONNECTED)) {
-        delay(500);
-        Serial.print(".");
-        timer_wifi_connect++;
-        if (500 * timer_wifi_connect > TIMEOUT_WIFI_CONNECT_MS) {
-            timer_wifi_connect = 0;
-            return WIFI_DEBUGGER_ERROR_WIFI;
-        }
-    }
-
-    Serial.println("");
-    Serial.println("WiFi verbunden");
-    Serial.println("IP-Addresse: ");
-    Serial.println(WiFi.localIP());
-
-    return WIFI_DEBUGGER_ERROR_NO_ERROR;
-}
-
-WIFI_DEBUGGER_ERROR_t wifi_debugger_firmwareUpdate(void) {
+GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(void) {
     // initiate wifi update client
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
@@ -85,29 +39,29 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_firmwareUpdate(void) {
         case HTTP_UPDATE_FAILED:
             Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", httpUpdate.getLastError(),
                           httpUpdate.getLastErrorString().c_str());
-            return WIFI_DEBUGGER_ERROR_HTTP;
+            return GITHUB_UPDATE_ERROR_HTTP;
 
         case HTTP_UPDATE_NO_UPDATES:
             Serial.println("HTTP_UPDATE_NO_UPDATES");
-            return WIFI_DEBUGGER_ERROR_NO_UPDATE;
+            return GITHUB_UPDATE_ERROR_NO_UPDATE;
 
         case HTTP_UPDATE_OK:
             Serial.println("HTTP_UPDATE_OK");
-            return WIFI_DEBUGGER_ERROR_NO_ERROR;
+            return GITHUB_UPDATE_ERROR_NO_ERROR;
     }
 }
 
-WIFI_DEBUGGER_ERROR_t wifi_debugger_firmwareUpdate(const char *desired_version) {
+GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version) {
     // TODO: check for proper format
     fw_version = desired_version;
-    return wifi_debugger_firmwareUpdate();
+    return github_update_firmwareUpdate();
 }
 
-WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
+GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
     // if wifi not connected, cancel early
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Wifi is not connected");
-        return WIFI_DEBUGGER_ERROR_WIFI;
+        return GITHUB_UPDATE_ERROR_WIFI;
     }
 
     int httpCode;;
@@ -118,8 +72,6 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_
 
         // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
         HTTPClient https;
-
-
 
         if (https.begin(*client, url_fw_version)) {
             // start connection and send HTTP header
@@ -137,7 +89,7 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_
             } else {
                 Serial.print("error in downloading version file:");
                 Serial.println(httpCode);
-                return WIFI_DEBUGGER_ERROR_HTTP;
+                return GITHUB_UPDATE_ERROR_HTTP;
             }
             https.end();
         }
@@ -165,13 +117,9 @@ WIFI_DEBUGGER_ERROR_t wifi_debugger_fwVersionCheck(uint8_t fw_major, uint8_t fw_
         } else {
             Serial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
                           fw_major, fw_minor, fw_patch);
-            return WIFI_DEBUGGER_ERROR_NO_UPDATE;
+            return GITHUB_UPDATE_ERROR_NO_UPDATE;
         }
-        return WIFI_DEBUGGER_ERROR_NO_ERROR;
+        return GITHUB_UPDATE_ERROR_NO_ERROR;
     }
-    return WIFI_DEBUGGER_ERROR_HTTP;
-}
-
-bool wifi_debugger_is_connected() {
-    return WiFi.isConnected();
+    return GITHUB_UPDATE_ERROR_HTTP;
 }
