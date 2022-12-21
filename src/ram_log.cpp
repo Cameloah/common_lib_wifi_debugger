@@ -52,5 +52,6 @@ void ram_log_print_log() {
         else
             DualSerial.printf("%d: ", _ringbuffer[item].item_type);
         DualSerial.println(_ringbuffer[item].payload.c_str());
+        delay(200);
     }
 }
