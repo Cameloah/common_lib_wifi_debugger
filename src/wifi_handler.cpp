@@ -50,6 +50,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_p
 
     webserial_monitor_init();
 
+
     return retval;
 }
 
