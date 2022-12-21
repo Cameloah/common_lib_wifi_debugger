@@ -46,7 +46,7 @@ void ram_log_print_log() {
         uint8_t sec = seconds % 60;		seconds /= 60;
         uint8_t min = seconds % 60;		seconds /= 60;
         uint8_t hrs = seconds % 24;
-        DualSerial.printf("%d:%d:%d:%d ", hrs, min, sec, ms);
+        DualSerial.printf("%dh:%dm:%ds:%dms ", hrs, min, sec, ms);
         if (_ringbuffer[item].item_type == RAM_LOG_INFO)
             DualSerial.print("INFO: ");
         else
