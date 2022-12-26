@@ -48,8 +48,9 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_p
     github_update_init(url_version, url_bin);
 #endif
 
+#ifdef SYS_CONTROL_WEBSERIAL
     webserial_monitor_init();
-
+#endif
 
     return retval;
 }
