@@ -61,6 +61,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
 #ifdef SYS_CONTROL_STAT_IP
     if (!WiFi.config(_local_IP, _gateway, _subnet, _primaryDNS, _secondaryDNS)) {
         Serial.println("Static IP failed to configure");
+        return WIFI_HANDLER_ERROR_CONFIG;
     }
 #endif
 
@@ -71,7 +72,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
         timer_wifi_connect++;
         if (500 * timer_wifi_connect > TIMEOUT_WIFI_CONNECT_MS) {
             timer_wifi_connect = 0;
-            return WIFI_HANDLER_ERROR_WIFI;
+            return WIFI_HANDLER_ERROR_CONNECT;
         }
     }
 

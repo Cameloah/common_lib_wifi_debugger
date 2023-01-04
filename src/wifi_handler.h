@@ -17,9 +17,8 @@ extern AsyncWebServer server;
 
 typedef enum{
     WIFI_HANDLER_ERROR_NO_ERROR        = 0x00,
-    WIFI_HANDLER_ERROR_WIFI            = 0x01,
-    WIFI_HANDLER_ERROR_HTTP            = 0x02,
-    WIFI_HANDLER_ERROR_NO_UPDATE       = 0x03,
+    WIFI_HANDLER_ERROR_CONFIG          = 0x01,
+    WIFI_HANDLER_ERROR_CONNECT         = 0x02,
     WIFI_HANDLER_ERROR_UNKNOWN         = 0xFF
 } WIFI_HANDLER_ERROR_t;
 

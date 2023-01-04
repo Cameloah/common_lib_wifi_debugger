@@ -24,13 +24,15 @@ void ram_log_notify(RAM_LOG_ITEM_t itemtype, uint32_t user_payload) {
     _ringbuffer_item_count = (_ringbuffer_item_count > RAM_LOG_RINGBUFFER_LEN) ? RAM_LOG_RINGBUFFER_LEN : _ringbuffer_item_count+1;
 }
 
-void ram_log_notify(RAM_LOG_ITEM_t itemtype, const char *user_payload) {
+void ram_log_notify(RAM_LOG_ITEM_t itemtype, const char *user_payload, bool flag_print) {
     // save timestamp
     _ringbuffer[_ringbuffer_item_index].timestamp = millis();
     // save item type
     _ringbuffer[_ringbuffer_item_index].item_type = itemtype;
     // save payload as string
     _ringbuffer[_ringbuffer_item_index].payload = user_payload;
+    // if wanted, also print string
+    if (flag_print) DualSerial.println(user_payload);
 
     // increase item index
     _ringbuffer_item_index = (_ringbuffer_item_index + 1) % RAM_LOG_RINGBUFFER_LEN;
