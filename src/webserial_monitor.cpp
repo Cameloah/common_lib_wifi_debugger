@@ -66,7 +66,7 @@ void recvMsg(uint8_t *data, size_t len){
     for(int i=0; i < len; i++){
         DualSerial.buffer_webserial += char(data[i]);
     }
-    DualSerial.print(">>>>"); DualSerial.println(DualSerial.buffer_webserial);
+    DualSerial.print("WebUser>>>> "); DualSerial.println(DualSerial.buffer_webserial);
 }
 
 void webserial_monitor_init() {
@@ -75,6 +75,5 @@ void webserial_monitor_init() {
     // WebSerial is accessible at "<IP Address>/webserial" in browser
     WebSerial.begin(&server);
     WebSerial.msgCallback(recvMsg);
-    server.begin();
 }
 
