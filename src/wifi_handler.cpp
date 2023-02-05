@@ -6,6 +6,7 @@
 #include "wifi_handler.h"
 #include "github_update.h"
 #include "webserial_monitor.h"
+#include "network_ota.h"
 #include "../../../include/tools/loop_timer.h"
 
 /*
@@ -52,7 +53,14 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_p
     webserial_monitor_init();
 #endif
 
+    network_ota_init();
+
+    server.begin();
     return retval;
+}
+
+void wifi_handler_update() {
+    network_ota_update();
 }
 
 WIFI_HANDLER_ERROR_t wifi_handler_connect() {
@@ -68,7 +76,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     WiFi.begin(_ssid.c_str(), _password.c_str());
     while ((WiFi.status() != WL_CONNECTED)) {
         delay(500);
-        Serial.print(".");
+        DualSerial.print(".");
         timer_wifi_connect++;
         if (500 * timer_wifi_connect > TIMEOUT_WIFI_CONNECT_MS) {
             timer_wifi_connect = 0;
@@ -76,10 +84,10 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
         }
     }
 
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP-address: ");
-    Serial.println(WiFi.localIP());
+    DualSerial.println("");
+    DualSerial.println("WiFi connected");
+    DualSerial.println("IP-address: ");
+    DualSerial.println(WiFi.localIP());
 
     return WIFI_HANDLER_ERROR_NO_ERROR;
 }
