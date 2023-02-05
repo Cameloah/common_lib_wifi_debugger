@@ -7,7 +7,7 @@
 #include "ESPAsyncWebServer.h"
 #include "webserial_monitor.h"
 
-// #define SYS_CONTROL_STAT_IP
+#define SYS_CONTROL_STAT_IP
 #define SYS_CONTROL_AUTO_UPDATE
 #define SYS_CONTROL_WEBSERIAL
 
