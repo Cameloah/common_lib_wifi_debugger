@@ -1,6 +1,5 @@
-#include <Arduino.h>
 #include <WiFi.h>
-#include <AsyncTCP.h>
+// #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
 #include "wifi_handler.h"
@@ -16,19 +15,17 @@
  * This file will create the WiFi and handle all modules that use WiFi
  */
 
-
-wifi_info_t _wifi_info_buffer;
+// object that will contain the credential data for the current wifi
+wifi_info_t wifi_info_buffer;
 
 int timer_wifi_connect = 0;
 AsyncWebServer server(80);
 
-WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_password, const char *user_ip,
-                                       const char *user_gateway, const char *user_subnet, const char *url_version,
-                                       const char *url_bin) {
+WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_bin) {
     WIFI_HANDLER_ERROR_t retval = WIFI_HANDLER_ERROR_UNKNOWN;
 
     // try to load wifi info from wifi manager
-    if (wifi_manager_load(&_wifi_info_buffer)) {
+    if (wifi_manager_load(&wifi_info_buffer)) {
         // we have data, therefore connect normally
         // establish connection
         if ((retval = wifi_handler_connect()) != WIFI_HANDLER_ERROR_NO_ERROR)
@@ -36,7 +33,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_p
     }
 
     // otherwise we need an access point
-    else wifi_manager_AP(&_wifi_info_buffer);
+    else wifi_manager_AP(&wifi_info_buffer);
 
     // initialize modules
 #ifdef SYS_CONTROL_AUTO_UPDATE
@@ -67,8 +64,8 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     }
 #endif
 
-    WiFi.begin(_wifi_info_buffer._ssid.c_str(), _wifi_info_buffer._password.c_str());
-    while ((WiFi.status() != WL_CONNECTED)) {
+    WiFi.begin(wifi_info_buffer._ssid.c_str(), wifi_info_buffer._password.c_str());
+    while ((WiFiClass::status() != WL_CONNECTED)) {
         delay(500);
         DualSerial.print(".");
         timer_wifi_connect++;

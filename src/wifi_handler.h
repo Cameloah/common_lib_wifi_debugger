@@ -32,8 +32,7 @@ typedef enum{
     WIFI_HANDLER_ERROR_UNKNOWN         = 0xFF
 } WIFI_HANDLER_ERROR_t;
 
-WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_password, const char *user_ip, const char *user_gateway,
-                                       const char *user_subnet, const char *url_version, const char *url_bin);
+WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_bin);
 void wifi_handler_update();
 WIFI_HANDLER_ERROR_t wifi_handler_connect();
 bool wifi_handler_is_connected();
