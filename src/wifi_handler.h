@@ -15,6 +15,16 @@
 
 extern AsyncWebServer server;
 
+typedef  struct {
+    String _ssid;
+    String _password;
+    IPAddress _local_IP;
+    IPAddress _gateway;
+    IPAddress _subnet;
+    IPAddress _primaryDNS;
+    IPAddress _secondaryDNS;
+} wifi_info_t;
+
 typedef enum{
     WIFI_HANDLER_ERROR_NO_ERROR        = 0x00,
     WIFI_HANDLER_ERROR_CONFIG          = 0x01,

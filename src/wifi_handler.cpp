@@ -7,6 +7,7 @@
 #include "github_update.h"
 #include "webserial_monitor.h"
 #include "network_ota.h"
+#include "wifi_manager.h"
 #include "../../../include/tools/loop_timer.h"
 
 /*
@@ -15,17 +16,10 @@
  * This file will create the WiFi and handle all modules that use WiFi
  */
 
-String _ssid;
-String _password;
 
-IPAddress _local_IP;
-IPAddress _gateway;
-IPAddress _subnet;
-IPAddress _primaryDNS(8, 8, 8, 8);
-IPAddress _secondaryDNS(8, 8, 4, 4);
+wifi_info_t _wifi_info_buffer;
 
 int timer_wifi_connect = 0;
-
 AsyncWebServer server(80);
 
 WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_password, const char *user_ip,
@@ -33,16 +27,16 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *user_ssid, const char *user_p
                                        const char *url_bin) {
     WIFI_HANDLER_ERROR_t retval = WIFI_HANDLER_ERROR_UNKNOWN;
 
-    // get all the user data first
-    _local_IP.fromString(user_ip);
-    _gateway.fromString(user_gateway);
-    _subnet.fromString(user_subnet);
-    _ssid = user_ssid;
-    _password = user_password;
+    // try to load wifi info from wifi manager
+    if (wifi_manager_load(&_wifi_info_buffer)) {
+        // we have data, therefore connect normally
+        // establish connection
+        if ((retval = wifi_handler_connect()) != WIFI_HANDLER_ERROR_NO_ERROR)
+            return retval;
+    }
 
-    // establish connection
-    if((retval = wifi_handler_connect()) != WIFI_HANDLER_ERROR_NO_ERROR)
-        return retval;
+    // otherwise we need an access point
+    else wifi_manager_AP(&_wifi_info_buffer);
 
     // initialize modules
 #ifdef SYS_CONTROL_AUTO_UPDATE
@@ -73,7 +67,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     }
 #endif
 
-    WiFi.begin(_ssid.c_str(), _password.c_str());
+    WiFi.begin(_wifi_info_buffer._ssid.c_str(), _wifi_info_buffer._password.c_str());
     while ((WiFi.status() != WL_CONNECTED)) {
         delay(500);
         DualSerial.print(".");
