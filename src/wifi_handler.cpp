@@ -1,5 +1,4 @@
 #include <WiFi.h>
-// #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
 #include "wifi_handler.h"
@@ -25,15 +24,19 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_
     WIFI_HANDLER_ERROR_t retval = WIFI_HANDLER_ERROR_UNKNOWN;
 
     // try to load wifi info from wifi manager
-    if (wifi_manager_load(&wifi_info_buffer)) {
+    if ((retval = wifi_manager_load(&wifi_info_buffer)) == WIFI_HANDLER_ERROR_NO_ERROR) {
         // we have data, therefore connect normally
         // establish connection
-        if ((retval = wifi_handler_connect()) != WIFI_HANDLER_ERROR_NO_ERROR)
-            return retval;
+        if ((retval = wifi_handler_connect()) == WIFI_HANDLER_ERROR_CONNECT)
+            if((retval = wifi_manager_AP()) != WIFI_HANDLER_ERROR_NO_ERROR) return retval; // we couldnt connect, use AP
+
+    }
+    // if no config we need an access point
+    else if (retval == WIFI_HANDLER_ERROR_CONFIG) {
+        if((retval = wifi_manager_AP()) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
     }
 
-    // otherwise we need an access point
-    else wifi_manager_AP(&wifi_info_buffer);
+    else return retval;
 
     // initialize modules
 #ifdef SYS_CONTROL_AUTO_UPDATE
@@ -52,6 +55,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_
 
 void wifi_handler_update() {
     network_ota_update();
+    wifi_manager_update();
 }
 
 WIFI_HANDLER_ERROR_t wifi_handler_connect() {

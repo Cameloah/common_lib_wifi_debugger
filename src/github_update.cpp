@@ -18,7 +18,6 @@ String fw_version;
 
 
 void github_update_init(const char *url_version, const char *url_bin) {
-
     url_fw_version = url_version;
     url_fw_bin = url_bin;
 }

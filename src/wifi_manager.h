@@ -6,5 +6,6 @@
 
 #include "wifi_handler.h"
 
-bool wifi_manager_load(wifi_info_t* user_buffer);
-void wifi_manager_AP(wifi_info_t* user_buffer);
+WIFI_HANDLER_ERROR_t wifi_manager_load(wifi_info_t* user_buffer);
+WIFI_HANDLER_ERROR_t wifi_manager_AP();
+void wifi_manager_update();
