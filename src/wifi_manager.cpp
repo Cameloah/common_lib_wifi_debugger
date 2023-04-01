@@ -75,6 +75,56 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
     }
 }
 
+void webfct_wifi_get(AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/wifimanager.html", "text/html");
+}
+
+void webfct_wifi_post(AsyncWebServerRequest *request) {
+    int params = request->params();
+    for(int i=0;i<params;i++){
+        AsyncWebParameter* p = request->getParam(i);
+        if(p->isPost()){
+            // HTTP POST ssid value
+            if (p->name() == PARAM_INPUT_1) {
+                ssid = p->value().c_str();
+                DualSerial.print("SSID set to: ");
+                DualSerial.println(ssid);
+                // Write file to save value
+                writeFile(SPIFFS, ssidPath, ssid.c_str());
+            }
+            // HTTP POST pass value
+            if (p->name() == PARAM_INPUT_2) {
+                pass = p->value().c_str();
+                DualSerial.print("Password set to: ");
+                DualSerial.println(pass);
+                // Write file to save value
+                writeFile(SPIFFS, passPath, pass.c_str());
+            }
+            // HTTP POST ip value
+            if (p->name() == PARAM_INPUT_3) {
+                ip = p->value().c_str();
+                DualSerial.print("IP Address set to: ");
+                DualSerial.println(ip);
+                // Write file to save value
+                writeFile(SPIFFS, ipPath, ip.c_str());
+            }
+            // HTTP POST gateway value
+            if (p->name() == PARAM_INPUT_4) {
+                gateway = p->value().c_str();
+                DualSerial.print("Gateway set to: ");
+                DualSerial.println(gateway);
+                // Write file to save value
+                writeFile(SPIFFS, gatewayPath, gateway.c_str());
+            }
+            //DualSerial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        }
+    }
+    request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
+    delay(3000);
+    ESP.restart();
+}
+
+
 // Replaces placeholder with LED state value
 String processor(const String& var) {
     if(var == "STATE") {
@@ -129,59 +179,7 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP() {
     dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
     // Web Server Root URL
-    server.onNotFound([](AsyncWebServerRequest *request){
-        request->send(SPIFFS, "/wifimanager.html", "text/html");
-    });
-    server.on("/wifi", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(SPIFFS, "/wifimanager.html", "text/html");
-    });
-
-    server.serveStatic("/", SPIFFS, "/");
-
-    server.on("/", HTTP_POST, [](AsyncWebServerRequest *request) {
-        int params = request->params();
-        for(int i=0;i<params;i++){
-            AsyncWebParameter* p = request->getParam(i);
-            if(p->isPost()){
-                // HTTP POST ssid value
-                if (p->name() == PARAM_INPUT_1) {
-                    ssid = p->value().c_str();
-                    DualSerial.print("SSID set to: ");
-                    DualSerial.println(ssid);
-                    // Write file to save value
-                    writeFile(SPIFFS, ssidPath, ssid.c_str());
-                }
-                // HTTP POST pass value
-                if (p->name() == PARAM_INPUT_2) {
-                    pass = p->value().c_str();
-                    DualSerial.print("Password set to: ");
-                    DualSerial.println(pass);
-                    // Write file to save value
-                    writeFile(SPIFFS, passPath, pass.c_str());
-                }
-                // HTTP POST ip value
-                if (p->name() == PARAM_INPUT_3) {
-                    ip = p->value().c_str();
-                    DualSerial.print("IP Address set to: ");
-                    DualSerial.println(ip);
-                    // Write file to save value
-                    writeFile(SPIFFS, ipPath, ip.c_str());
-                }
-                // HTTP POST gateway value
-                if (p->name() == PARAM_INPUT_4) {
-                    gateway = p->value().c_str();
-                    DualSerial.print("Gateway set to: ");
-                    DualSerial.println(gateway);
-                    // Write file to save value
-                    writeFile(SPIFFS, gatewayPath, gateway.c_str());
-                }
-                //DualSerial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-            }
-        }
-        request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
-        delay(3000);
-        ESP.restart();
-    });
+    server.onNotFound(webfct_wifi_get);
 
     flag_ap_active = true;
     return WIFI_HANDLER_ERROR_NO_ERROR;

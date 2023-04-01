@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
+#include "SPIFFS.h"
 
 #include "wifi_handler.h"
 #include "github_update.h"
@@ -48,6 +49,10 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_
 #endif
 
     network_ota_init();
+
+    server.serveStatic("/", SPIFFS, "/");
+    server.on("/wifi", HTTP_GET, webfct_wifi_get);
+    server.on("/", HTTP_POST, webfct_wifi_post);
 
     server.begin();
     return retval;
