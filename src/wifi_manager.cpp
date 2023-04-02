@@ -165,7 +165,7 @@ WIFI_HANDLER_ERROR_t wifi_manager_load(wifi_info_t* user_buffer) {
 
 WIFI_HANDLER_ERROR_t wifi_manager_AP() {
     // Connect to Wi-Fi network with SSID and password
-    ram_log_notify(RAM_LOG_INFO, "Setting Access Point", true);
+    ram_log_notify(RAM_LOG_INFO, "Starting Access Point", true);
     // nullptr sets an open Access Point
 
     if(!WiFi.softAP("New ESP-Device", AP_PASSWORD))
@@ -188,6 +188,19 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP() {
 void wifi_manager_update() {
     if (flag_ap_active)
         dnsServer.processNextRequest();
+
+#ifdef AP_TIMEOUT
+    if (flag_ap_active && millis() > AP_TIMEOUT) {
+        // Mr. Gorbatschow, tear down that Access Point
+        ram_log_notify(RAM_LOG_INFO, "Stopping access point", true);
+        dnsServer.stop();
+        WiFi.mode(WIFI_STA);
+        WiFi.disconnect();
+        flag_ap_active = false;
+        wifi_handler_connect();
+    }
+#endif
+
 }
 
 /*

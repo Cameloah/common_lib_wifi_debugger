@@ -13,6 +13,8 @@
 
 // set this to any password to protect the AP
 #define AP_PASSWORD                     nullptr
+// comment this out to have an always on AP
+#define AP_TIMEOUT                      30000      // 5 min
 
 #define TIMEOUT_WIFI_CONNECT_MS         5000
 
