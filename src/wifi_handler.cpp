@@ -3,7 +3,6 @@
 #include "SPIFFS.h"
 
 #include "wifi_handler.h"
-#include "github_update.h"
 #include "webserial_monitor.h"
 #include "network_ota.h"
 #include "wifi_manager.h"
@@ -21,7 +20,7 @@ wifi_info_t wifi_info_buffer;
 int timer_wifi_connect = 0;
 AsyncWebServer server(80);
 
-WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_bin) {
+WIFI_HANDLER_ERROR_t wifi_handler_init() {
     WIFI_HANDLER_ERROR_t retval = WIFI_HANDLER_ERROR_UNKNOWN;
 
     // try to load wifi info from wifi manager
@@ -40,10 +39,6 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_
     else return retval;
 
     // initialize modules
-#ifdef SYS_CONTROL_AUTO_UPDATE
-    github_update_init(url_version, url_bin);
-#endif
-
 #ifdef SYS_CONTROL_WEBSERIAL
     webserial_monitor_init();
 #endif

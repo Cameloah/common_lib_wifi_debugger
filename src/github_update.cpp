@@ -1,5 +1,5 @@
 //
-// Created by Jo Uni on 08/12/2022.
+// Created by Camleoah on 08/12/2022.
 //
 
 #include <Arduino.h>
@@ -56,7 +56,7 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version) 
     return github_update_firmwareUpdate();
 }
 
-GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
     // if wifi not connected, cancel early
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Wifi is not connected");
@@ -104,18 +104,18 @@ GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_
         uint8_t fw_latest_minor = atoi(strtok(nullptr, "v.\n"));
         uint8_t fw_latest_patch = atoi(strtok(nullptr, "v.\n"));
 
-        if (fw_latest_major > fw_major) {
+        if (fw_latest_major > FW_VERSION_MAJOR) {
             Serial.printf("\nNew Firmware detected! Major update available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
-        } else if (fw_latest_major == fw_major && fw_latest_minor > fw_minor) {
+        } else if (fw_latest_major == FW_VERSION_MAJOR && fw_latest_minor > FW_VERSION_MINOR) {
             Serial.printf("\nNew Firmware detected! Minor update available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
-        } else if (fw_latest_major == fw_major && fw_latest_minor == fw_minor && fw_latest_patch > fw_patch) {
+        } else if (fw_latest_major == FW_VERSION_MAJOR && fw_latest_minor == FW_VERSION_MINOR && fw_latest_patch > FW_VERSION_PATCH) {
             Serial.printf("\nNew Firmware detected! New Patch available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
         } else {
             Serial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
-                          fw_major, fw_minor, fw_patch);
+                          FW_VERSION_MAJOR, FW_VERSION_MINOR, FW_VERSION_PATCH);
             return GITHUB_UPDATE_ERROR_NO_UPDATE;
         }
         return GITHUB_UPDATE_ERROR_NO_ERROR;

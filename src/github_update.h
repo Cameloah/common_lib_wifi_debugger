@@ -1,10 +1,15 @@
 //
-// Created by Jo Uni on 08/12/2022.
+// Created by Camleoah on 08/12/2022.
 //
 
 #pragma once
 
 #include "webserial_monitor.h"
+#include "../../../include/version.h"
+
+#define URL_FW_VERSION "https://github.com/" GITHUB_REPO "/releases/latest"
+#define URL_FW_BIN "https://github.com/" GITHUB_REPO "/releases/download/<version>/" GITHUB_FW_BIN
+#define URL_FS_BIN "https://github.com/" GITHUB_REPO "/releases/download/<version>/" GITHUB_FS_BIN
 
 typedef enum{
     GITHUB_UPDATE_ERROR_NO_ERROR        = 0x00,
@@ -24,13 +29,8 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate();
 GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version);
 
 /// Checks for the latest release version on a github repository and compares to current version
-/// \param fw_major current major
-/// \param fw_minor current minor
-/// \param fw_patch current patch
 /// \return GITHUB_UPDATE_ERROR_t status if new version is available
-GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch);
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest();
 
 /// Initializes the github update module
-/// \param url_version url string to the latest github release of that project
-/// \param url_bin url to the download server of github to download latest bin
-void github_update_init(const char *url_version, const char *url_bin);
+void github_update_init();

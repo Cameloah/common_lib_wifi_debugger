@@ -1,5 +1,5 @@
 //
-// Created by koorj on 03.03.2022.
+// Created by Camleoah on 03.03.2022.
 //
 
 #pragma once
@@ -8,7 +8,6 @@
 #include "webserial_monitor.h"
 
 // #define SYS_CONTROL_STAT_IP
-#define SYS_CONTROL_AUTO_UPDATE
 #define SYS_CONTROL_WEBSERIAL
 
 // set this to any password to protect the AP
@@ -44,7 +43,7 @@ typedef enum{
 /// \param url_version url to latest github release
 /// \param url_bin url to download latest bin file from github
 /// \return error code
-WIFI_HANDLER_ERROR_t wifi_handler_init(const char *url_version, const char *url_bin);
+WIFI_HANDLER_ERROR_t wifi_handler_init();
 
 /// needs to be run periodically to update services
 void wifi_handler_update();
