@@ -67,7 +67,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     Serial.println("Waiting for WiFi");
 
 #ifdef SYS_CONTROL_STAT_IP
-    if (!WiFi.config(_local_IP, _gateway, _subnet, _primaryDNS, _secondaryDNS)) {
+    if (!WiFi.config(wifi_info_buffer._local_IP, wifi_info_buffer._gateway, wifi_info_buffer._subnet, wifi_info_buffer._primaryDNS, wifi_info_buffer._secondaryDNS)) {
         Serial.println("Static IP failed to configure");
         return WIFI_HANDLER_ERROR_CONFIG;
     }
@@ -94,4 +94,17 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
 
 bool wifi_handler_is_connected() {
     return WiFi.isConnected();
+}
+
+String wifi_handler_get_mode() {
+    switch (WiFi.getMode()) {
+        case 1:
+            return "STA Mode";
+        case 2:
+            return "AP Mode";
+        case 3:
+            return "STA and AP Mode";
+        default:
+            return "unknown";
+    }
 }

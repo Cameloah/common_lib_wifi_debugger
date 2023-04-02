@@ -14,7 +14,7 @@
 // set this to any password to protect the AP
 #define AP_PASSWORD                     nullptr
 // comment this out to have an always on AP
-#define AP_TIMEOUT                      30000      // 5 min
+// #define AP_TIMEOUT                      300000      // 5 min
 
 #define TIMEOUT_WIFI_CONNECT_MS         5000
 
@@ -56,3 +56,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect();
 /// Getter to get wifi connection state
 /// \return boolean success
 bool wifi_handler_is_connected();
+
+/// Getter to get formatted wifi module mode
+/// \return String
+String wifi_handler_get_mode();

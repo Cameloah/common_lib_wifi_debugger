@@ -22,7 +22,7 @@ void github_update_init(const char *url_version, const char *url_bin) {
     url_fw_bin = url_bin;
 }
 
-GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(void) {
+GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate() {
     // initiate wifi update client
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);

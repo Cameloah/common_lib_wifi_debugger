@@ -124,21 +124,6 @@ void webfct_wifi_post(AsyncWebServerRequest *request) {
     ESP.restart();
 }
 
-
-// Replaces placeholder with LED state value
-String processor(const String& var) {
-    if(var == "STATE") {
-        if(bool_test) {
-            ledstate = "ON";
-        }
-        else {
-            ledstate = "OFF";
-        }
-        return ledstate;
-    }
-    return {};
-}
-
 WIFI_HANDLER_ERROR_t wifi_manager_load(wifi_info_t* user_buffer) {
     if (!SPIFFS.begin(true)) {
         return WIFI_HANDLER_ERROR_SPIFFS;
@@ -204,6 +189,20 @@ void wifi_manager_update() {
 }
 
 /*
+// Replaces placeholder with LED state value
+String processor(const String& var) {
+    if(var == "STATE") {
+        if(bool_test) {
+            ledstate = "ON";
+        }
+        else {
+            ledstate = "OFF";
+        }
+        return ledstate;
+    }
+    return {};
+}
+
 void example_website() {
     DualSerial.println(ssid);
     DualSerial.println(pass);
