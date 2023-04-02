@@ -12,15 +12,8 @@
 #include "cert.h"
 #include "../../../include/tools/loop_timer.h"
 
-String url_fw_version;
-String url_fw_bin;
+String url_fw_bin = URL_FW_BIN;
 String fw_version;
-
-
-void github_update_init(const char *url_version, const char *url_bin) {
-    url_fw_version = url_version;
-    url_fw_bin = url_bin;
-}
 
 GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate() {
     // initiate wifi update client
@@ -72,7 +65,7 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
         // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
         HTTPClient https;
 
-        if (https.begin(*client, url_fw_version)) {
+        if (https.begin(*client, URL_FW_VERSION)) {
             // start connection and send HTTP header
             delay(100);
             // access the url
