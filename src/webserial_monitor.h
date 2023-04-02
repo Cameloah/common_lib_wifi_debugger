@@ -22,4 +22,5 @@ public:
 
 extern DualPrint DualSerial;
 
+/// initializes the webserial service
 void webserial_monitor_init();

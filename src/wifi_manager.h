@@ -6,9 +6,22 @@
 
 #include "wifi_handler.h"
 
+/// get callback for page /wifi
+/// \param request incoming request
 void webfct_wifi_get(AsyncWebServerRequest *request);
+
+/// post callback for page /wifi
+/// \param request incoming request
 void webfct_wifi_post(AsyncWebServerRequest *request);
 
+/// loads saved wifi configuration if available
+/// \param user_buffer user provided buffer to save wifi configuration
+/// \return WIFI_HANDLER_ERROR_t error code
 WIFI_HANDLER_ERROR_t wifi_manager_load(wifi_info_t* user_buffer);
+
+/// setup and start an access point for users to log on and set up the device
+/// \return WIFI_HANDLER_ERROR_t error code
 WIFI_HANDLER_ERROR_t wifi_manager_AP();
+
+/// needs to be run periodically
 void wifi_manager_update();
