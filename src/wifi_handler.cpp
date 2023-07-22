@@ -27,13 +27,15 @@ WIFI_HANDLER_ERROR_t wifi_handler_init() {
     if ((retval = wifi_manager_load(&wifi_info_buffer)) == WIFI_HANDLER_ERROR_NO_ERROR) {
         // we have data, therefore connect normally
         // establish connection
+        String device_ip = wifi_info_buffer._local_IP.toString();
+        wifi_info_buffer.device_name.concat(device_ip[device_ip.length() - 1]);
         if ((retval = wifi_handler_connect()) == WIFI_HANDLER_ERROR_CONNECT)
-            if((retval = wifi_manager_AP()) != WIFI_HANDLER_ERROR_NO_ERROR) return retval; // we couldnt connect, use AP
+            if((retval = wifi_manager_AP(wifi_info_buffer.device_name)) != WIFI_HANDLER_ERROR_NO_ERROR) return retval; // we couldnt connect, use AP
 
     }
     // if no config we need an access point
     else if (retval == WIFI_HANDLER_ERROR_CONFIG) {
-        if((retval = wifi_manager_AP()) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
+        if((retval = wifi_manager_AP(wifi_info_buffer.ap_name)) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
     }
 
     else return retval;

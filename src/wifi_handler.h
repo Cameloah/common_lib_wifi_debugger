@@ -27,6 +27,8 @@ typedef  struct {
     IPAddress _subnet;
     IPAddress _primaryDNS;
     IPAddress _secondaryDNS;
+    String ap_name;
+    String device_name;
 } wifi_info_t;
 
 typedef enum{
@@ -37,6 +39,8 @@ typedef enum{
     WIFI_HANDLER_ERROR_AP              = 0x04,
     WIFI_HANDLER_ERROR_UNKNOWN         = 0xFF
 } WIFI_HANDLER_ERROR_t;
+
+extern wifi_info_t wifi_info_buffer;
 
 /// Initializes wifi, tries to connect to saved wifi, will setup an access point to input desired
 /// wifi credentials otherwise. activates modules such as github update etc
