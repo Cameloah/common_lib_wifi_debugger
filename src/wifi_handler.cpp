@@ -61,7 +61,7 @@ void wifi_handler_update() {
 }
 
 WIFI_HANDLER_ERROR_t wifi_handler_connect() {
-    Serial.println("Waiting for WiFi");
+    DualSerial.println("Waiting for WiFi");
 
 #ifdef SYS_CONTROL_STAT_IP
     if (!WiFi.config(wifi_info_buffer._local_IP, wifi_info_buffer._gateway, wifi_info_buffer._subnet, wifi_info_buffer._primaryDNS, wifi_info_buffer._secondaryDNS)) {
