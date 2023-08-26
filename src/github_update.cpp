@@ -1,5 +1,5 @@
 //
-// Created by Jo Uni on 08/12/2022.
+// Created by Camleoah on 08/12/2022.
 //
 
 #include <Arduino.h>
@@ -12,18 +12,11 @@
 #include "cert.h"
 #include "../../../include/tools/loop_timer.h"
 
-String url_fw_version;
-String url_fw_bin;
+String url_fw_bin = URL_FW_BIN;
+String url_fs_bin = URL_FS_BIN;
 String fw_version;
 
-
-void github_update_init(const char *url_version, const char *url_bin) {
-
-    url_fw_version = url_version;
-    url_fw_bin = url_bin;
-}
-
-GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(void) {
+GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate() {
     // initiate wifi update client
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
@@ -32,21 +25,55 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(void) {
     // lets update the given fw binary url with the latest version
     // TODO: check for proper format of url
     url_fw_bin.replace("<version>", fw_version);
-    Serial.printf("\nDownloading and installing Firmware Version %s...\n", fw_version.c_str());
-    t_httpUpdate_return ret = httpUpdate.update(client, url_fw_bin);
+    url_fs_bin.replace("<version>", fw_version);
 
-    switch (ret) {
+    // now lets see whether there exits a fs_bin file
+    HTTPClient https;
+    if (https.begin(client, url_fs_bin)) {
+        // start connection and send HTTP header
+        delay(100);
+        int httpCode;
+        // access the url
+        httpCode = https.GET();
+
+        if (httpCode == HTTP_CODE_FOUND) {// do download
+            DualSerial.println("\nFound filesystem bin. Downloading and installing...");
+            t_httpUpdate_return ret_fs = httpUpdate.updateSpiffs(client, url_fs_bin);
+
+            switch (ret_fs) {
+                case HTTP_UPDATE_FAILED:
+                    DualSerial.printf("FS update failed! Error (%d): %s\n", httpUpdate.getLastError(),
+                                      httpUpdate.getLastErrorString().c_str());
+                    break;
+
+                case HTTP_UPDATE_NO_UPDATES:
+                    DualSerial.println("FS no updates");
+                    break;
+
+                case HTTP_UPDATE_OK:
+                    DualSerial.println("FS successfully updated!");
+            }
+        }
+
+        https.end();
+    }
+
+
+    DualSerial.printf("\nDownloading and installing Firmware Version %s...\n", fw_version.c_str());
+    t_httpUpdate_return ret_fw = httpUpdate.update(client, url_fw_bin);
+
+    switch (ret_fw) {
         case HTTP_UPDATE_FAILED:
-            Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", httpUpdate.getLastError(),
+            DualSerial.printf("FW update failed! Error (%d): %s\n", httpUpdate.getLastError(),
                           httpUpdate.getLastErrorString().c_str());
             return GITHUB_UPDATE_ERROR_HTTP;
 
         case HTTP_UPDATE_NO_UPDATES:
-            Serial.println("HTTP_UPDATE_NO_UPDATES");
+            DualSerial.println("FW no update");
             return GITHUB_UPDATE_ERROR_NO_UPDATE;
 
         case HTTP_UPDATE_OK:
-            Serial.println("HTTP_UPDATE_OK");
+            DualSerial.println("FW successfully updated!");
             return GITHUB_UPDATE_ERROR_NO_ERROR;
     }
 }
@@ -57,14 +84,14 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version) 
     return github_update_firmwareUpdate();
 }
 
-GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch) {
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
     // if wifi not connected, cancel early
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Wifi is not connected");
+        DualSerial.println("Wifi is not connected");
         return GITHUB_UPDATE_ERROR_WIFI;
     }
 
-    int httpCode;;
+    int httpCode;
     WiFiClientSecure *client = new WiFiClientSecure;
 
     if (client) {
@@ -73,7 +100,7 @@ GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_
         // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
         HTTPClient https;
 
-        if (https.begin(*client, url_fw_version)) {
+        if (https.begin(*client, URL_FW_VERSION)) {
             // start connection and send HTTP header
             delay(100);
             // access the url
@@ -87,8 +114,8 @@ GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_
                 // lets extract the FW version from the url
                 fw_version = location.substring(location.indexOf("/releases/tag/") + 14);
             } else {
-                Serial.print("error in downloading version file:");
-                Serial.println(httpCode);
+                DualSerial.print("error in downloading version file:");
+                DualSerial.println(httpCode);
                 return GITHUB_UPDATE_ERROR_HTTP;
             }
             https.end();
@@ -105,18 +132,18 @@ GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_
         uint8_t fw_latest_minor = atoi(strtok(nullptr, "v.\n"));
         uint8_t fw_latest_patch = atoi(strtok(nullptr, "v.\n"));
 
-        if (fw_latest_major > fw_major) {
-            Serial.printf("\nNew Firmware detected! Major update available: v%d.%d.%d\n",
+        if (fw_latest_major > FW_VERSION_MAJOR) {
+            DualSerial.printf("\nNew Firmware detected! Major update available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
-        } else if (fw_latest_major == fw_major && fw_latest_minor > fw_minor) {
-            Serial.printf("\nNew Firmware detected! Minor update available: v%d.%d.%d\n",
+        } else if (fw_latest_major == FW_VERSION_MAJOR && fw_latest_minor > FW_VERSION_MINOR) {
+            DualSerial.printf("\nNew Firmware detected! Minor update available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
-        } else if (fw_latest_major == fw_major && fw_latest_minor == fw_minor && fw_latest_patch > fw_patch) {
-            Serial.printf("\nNew Firmware detected! New Patch available: v%d.%d.%d\n",
+        } else if (fw_latest_major == FW_VERSION_MAJOR && fw_latest_minor == FW_VERSION_MINOR && fw_latest_patch > FW_VERSION_PATCH) {
+            DualSerial.printf("\nNew Firmware detected! New Patch available: v%d.%d.%d\n",
                           fw_latest_major, fw_latest_minor, fw_latest_patch);
         } else {
-            Serial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
-                          fw_major, fw_minor, fw_patch);
+            DualSerial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
+                          FW_VERSION_MAJOR, FW_VERSION_MINOR, FW_VERSION_PATCH);
             return GITHUB_UPDATE_ERROR_NO_UPDATE;
         }
         return GITHUB_UPDATE_ERROR_NO_ERROR;

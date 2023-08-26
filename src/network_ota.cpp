@@ -1,11 +1,14 @@
 //
-// Created by Jonas on 05.02.2023.
+// Created by Cameloah on 05.02.2023.
 //
 
 #include "network_ota.h"
 #include "Arduino.h"
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
+
+#include "webserial_monitor.h"
+#include "ram_log.h"
 
 
 void network_ota_init() {
@@ -31,27 +34,28 @@ void network_ota_init() {
         }
 
         // NOTE: if updating FS this would be the place to unmount FS using FS.end()
-        Serial.println("Start updating " + type);
+        DualSerial.println("Start updating " + type);
     });
     ArduinoOTA.onEnd([]() {
-        Serial.println("\nEnd");
+        DualSerial.println("\nEnd");
     });
     ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+        DualSerial.printf("Progress: %u%%\r", (progress / (total / 100)));
     });
     ArduinoOTA.onError([](ota_error_t error) {
-        Serial.printf("Error[%u]: ", error);
+        String error_str = "OTA Error[%u]: ";
         if (error == OTA_AUTH_ERROR) {
-            Serial.println("Auth Failed");
+            error_str.concat("Auth Failed");
         } else if (error == OTA_BEGIN_ERROR) {
-            Serial.println("Begin Failed");
+            error_str.concat("Begin Failed");
         } else if (error == OTA_CONNECT_ERROR) {
-            Serial.println("Connect Failed");
+            error_str.concat("Connect Failed");
         } else if (error == OTA_RECEIVE_ERROR) {
-            Serial.println("Receive Failed");
+            error_str.concat("Receive Failed");
         } else if (error == OTA_END_ERROR) {
-            Serial.println("End Failed");
+            error_str.concat("End Failed");
         }
+        ram_log_notify(RAM_LOG_INFO, error_str.c_str(), true);
     });
     ArduinoOTA.begin();
 }

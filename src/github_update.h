@@ -1,10 +1,15 @@
 //
-// Created by Jo Uni on 08/12/2022.
+// Created by Camleoah on 08/12/2022.
 //
 
 #pragma once
 
 #include "webserial_monitor.h"
+#include "../../../include/version.h"
+
+#define URL_FW_VERSION "https://github.com/" GITHUB_REPO "/releases/latest"
+#define URL_FW_BIN "https://github.com/" GITHUB_REPO "/releases/download/<version>/" GITHUB_FW_BIN
+#define URL_FS_BIN "https://github.com/" GITHUB_REPO "/releases/download/<version>/" GITHUB_FS_BIN
 
 typedef enum{
     GITHUB_UPDATE_ERROR_NO_ERROR        = 0x00,
@@ -14,8 +19,18 @@ typedef enum{
     GITHUB_UPDATE_ERROR_UNKNOWN         = 0xFF
 } GITHUB_UPDATE_ERROR_t;
 
+/// Tries to download the bin file matching the version saved in private buffer
+/// \return GITHUB_UPDATE_ERROR_t error code
 GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate();
-GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version);
-GITHUB_UPDATE_ERROR_t github_update_fwVersionCheck(uint8_t fw_major, uint8_t fw_minor, uint8_t fw_patch);
 
-void github_update_init(const char *url_version, const char *url_bin);
+/// Tries to download bin file for a specific firmware version
+/// \param desired_version version string in v0.0.0 format
+/// \return GITHUB_UPDATE_ERROR_t error code
+GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version);
+
+/// Checks for the latest release version on a github repository and compares to current version
+/// \return GITHUB_UPDATE_ERROR_t status if new version is available
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest();
+
+/// Initializes the github update module
+void github_update_init();

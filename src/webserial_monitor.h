@@ -1,5 +1,5 @@
 //
-// Created by Jo Uni on 08/12/2022.
+// Created by Camleoah on 08/12/2022.
 //
 
 #pragma once
@@ -22,4 +22,5 @@ public:
 
 extern DualPrint DualSerial;
 
+/// initializes the webserial service
 void webserial_monitor_init();
