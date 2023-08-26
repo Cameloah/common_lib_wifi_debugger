@@ -26,6 +26,13 @@ WIFI_HANDLER_ERROR_t wifi_handler_init() {
     // try to load wifi info from wifi manager
     if ((retval = wifi_manager_load(&wifi_info_buffer)) == WIFI_HANDLER_ERROR_NO_ERROR) {
         // we have data, therefore connect normally
+        DualSerial.print("Loaded WiFi: ");
+        DualSerial.println(wifi_info_buffer._ssid);
+        DualSerial.print("With Password: ");
+        DualSerial.println(wifi_info_buffer._password);
+        DualSerial.print("IP-Address: ");
+        DualSerial.println(wifi_info_buffer._local_IP);
+
         // establish connection
         String device_ip = wifi_info_buffer._local_IP.toString();
         wifi_info_buffer.device_name.concat(device_ip[device_ip.length() - 1]);
@@ -61,6 +68,11 @@ void wifi_handler_update() {
 }
 
 WIFI_HANDLER_ERROR_t wifi_handler_connect() {
+
+    // if we are in access point mode we dont look for wifi
+    if (WiFi.getMode() == 2)
+        return WIFI_HANDLER_ERROR_CONNECT;
+
     DualSerial.println("Waiting for WiFi");
 
 #ifdef SYS_CONTROL_STAT_IP

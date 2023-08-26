@@ -32,7 +32,7 @@ String ledstate = "OFF";
 String ip_default = "192.168.2.73";
 
 //Variables to save values from HTML form
-char ssid[20];
+char ssid[30];
 char pass[20];
 char ip[20];
 char gateway[20];
@@ -83,14 +83,14 @@ void read_data_from_eeprom() {
     EEPROM_readAnything(20,ip);
     EEPROM_readAnything(40,gateway);
     EEPROM_readAnything(60,ssid);
-    EEPROM_readAnything(80,pass);
+    EEPROM_readAnything(90,pass);
 }
 
 void save_data_to_eeprom() {
     EEPROM_writeAnything(20, ip);
     EEPROM_writeAnything(40, gateway);
     EEPROM_writeAnything(60, ssid);
-    EEPROM_writeAnything(80, pass);
+    EEPROM_writeAnything(90, pass);
 
     EEPROM.commit();
 }
