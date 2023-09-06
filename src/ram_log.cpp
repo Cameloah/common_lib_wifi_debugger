@@ -47,8 +47,9 @@ void ram_log_print_log() {
         uint16_t ms = (long int) _ringbuffer[item].timestamp % 1000;
         uint8_t sec = seconds % 60;		seconds /= 60;
         uint8_t min = seconds % 60;		seconds /= 60;
-        uint8_t hrs = seconds % 24;
-        DualSerial.printf("%dh:%dm:%ds:%dms ", hrs, min, sec, ms);
+        uint8_t hrs = seconds % 24;     seconds /= 24;
+        uint16_t d = seconds;
+        DualSerial.printf("%dd:%dh:%dm:%ds:%dms ", d, hrs, min, sec, ms);
         if (_ringbuffer[item].item_type == RAM_LOG_INFO)
             DualSerial.print("INFO: ");
         else
@@ -63,7 +64,8 @@ String ram_log_time_str(long int sys_ms) {
     uint16_t ms = sys_ms % 1000;
     uint8_t sec = seconds % 60;		seconds /= 60;
     uint8_t min = seconds % 60;		seconds /= 60;
-    uint8_t hrs = seconds % 24;
-    String time_str = String(hrs) + "h:" + String(min) + "m:" + String(sec) + "s:" + String(ms) + "ms";
+    uint8_t hrs = seconds % 24;     seconds /= 24;
+    uint16_t d = seconds;
+    String time_str = String(d) + "d:" + String(hrs) + "h:" + String(min) + "m:" + String(sec) + "s:" + String(ms) + "ms";
     return time_str;
 }
