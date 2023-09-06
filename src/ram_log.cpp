@@ -57,3 +57,13 @@ void ram_log_print_log() {
         delay(500);
     }
 }
+
+String ram_log_time_str(long int sys_ms) {
+    long int seconds = sys_ms / 1000;
+    uint16_t ms = sys_ms % 1000;
+    uint8_t sec = seconds % 60;		seconds /= 60;
+    uint8_t min = seconds % 60;		seconds /= 60;
+    uint8_t hrs = seconds % 24;
+    String time_str = String(hrs) + "h:" + String(min) + "m:" + String(sec) + "s:" + String(ms) + "ms";
+    return time_str;
+}

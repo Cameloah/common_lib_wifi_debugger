@@ -34,3 +34,8 @@ void ram_log_notify(RAM_LOG_ITEM_t itemtype, const char* user_payload, bool flag
 
 /// prints the entire ramlog and all entries nicely formatted
 void ram_log_print_log();
+
+/// returns the current uptime in a nice string format
+/// \param sys_ms current system time such as millis()
+/// \return string of time format
+String ram_log_time_str(long int sys_ms);
