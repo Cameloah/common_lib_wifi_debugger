@@ -1,5 +1,5 @@
 //
-// Created by Camleoah on 21/12/2022.
+// Created by Cameloah on 21/12/2022.
 //
 
 #include "ram_log.h"
@@ -11,11 +11,11 @@ uint8_t _ringbuffer_item_index = 0;
 uint8_t _ringbuffer_item_count = 0;
 
 
-void ram_log_notify(RAM_LOG_ITEM_t itemtype, uint32_t user_payload) {
+void ram_log_notify(RAM_LOG_ITEM_t item_type, uint32_t user_payload) {
     // save timestamp
     _ringbuffer[_ringbuffer_item_index].timestamp = millis();
     // save item type
-    _ringbuffer[_ringbuffer_item_index].item_type = itemtype;
+    _ringbuffer[_ringbuffer_item_index].item_type = item_type;
     // save payload as string
     _ringbuffer[_ringbuffer_item_index].payload = String(user_payload);
 
@@ -24,11 +24,11 @@ void ram_log_notify(RAM_LOG_ITEM_t itemtype, uint32_t user_payload) {
     _ringbuffer_item_count = (_ringbuffer_item_count > RAM_LOG_RINGBUFFER_LEN) ? RAM_LOG_RINGBUFFER_LEN : _ringbuffer_item_count+1;
 }
 
-void ram_log_notify(RAM_LOG_ITEM_t itemtype, const char *user_payload, bool flag_print) {
+void ram_log_notify(RAM_LOG_ITEM_t item_type, const char *user_payload, bool flag_print) {
     // save timestamp
     _ringbuffer[_ringbuffer_item_index].timestamp = millis();
     // save item type
-    _ringbuffer[_ringbuffer_item_index].item_type = itemtype;
+    _ringbuffer[_ringbuffer_item_index].item_type = item_type;
     // save payload as string
     _ringbuffer[_ringbuffer_item_index].payload = user_payload;
     // if wanted, also print string
@@ -43,7 +43,7 @@ void ram_log_print_log() {
     DualSerial.printf("Log items: %d\n", _ringbuffer_item_count);
 
     for (int item = 0; item < _ringbuffer_item_count; ++item) {
-        long int seconds = _ringbuffer[item].timestamp / 1000;
+        unsigned long int seconds = _ringbuffer[item].timestamp / 1000;
         uint16_t ms = (long int) _ringbuffer[item].timestamp % 1000;
         uint8_t sec = seconds % 60;		seconds /= 60;
         uint8_t min = seconds % 60;		seconds /= 60;
@@ -59,8 +59,8 @@ void ram_log_print_log() {
     }
 }
 
-String ram_log_time_str(long int sys_ms) {
-    long int seconds = sys_ms / 1000;
+String ram_log_time_str(unsigned long int sys_ms) {
+    unsigned long int seconds = sys_ms / 1000;
     uint16_t ms = sys_ms % 1000;
     uint8_t sec = seconds % 60;		seconds /= 60;
     uint8_t min = seconds % 60;		seconds /= 60;
