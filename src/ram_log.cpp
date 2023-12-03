@@ -17,7 +17,15 @@ void ram_log_notify(RAM_LOG_ITEM_t item_type, uint32_t user_payload) {
     // save item type
     _ringbuffer[_ringbuffer_item_index].item_type = item_type;
     // save payload as string
-    _ringbuffer[_ringbuffer_item_index].payload = String(user_payload);
+    switch (item_type) {
+        case RAM_LOG_ERROR_MEMORY:
+            _ringbuffer[_ringbuffer_item_index].payload = esp_err_to_name(user_payload);
+            break;
+
+        default:
+            _ringbuffer[_ringbuffer_item_index].payload = String(user_payload);
+
+    }
 
     // increase item index
     _ringbuffer_item_index = (_ringbuffer_item_index + 1) % RAM_LOG_RINGBUFFER_LEN;

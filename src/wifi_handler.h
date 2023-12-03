@@ -19,7 +19,7 @@
 
 extern AsyncWebServer server;
 
-typedef  struct {
+typedef struct {
     String _ssid;
     String _password;
     IPAddress _local_IP;

@@ -10,7 +10,6 @@
 
 #include "github_update.h"
 #include "cert.h"
-#include "../../../include/tools/loop_timer.h"
 
 String url_fw_bin = URL_FW_BIN;
 String url_fs_bin = URL_FS_BIN;
@@ -20,14 +19,14 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate() {
     // initiate wifi update client
     WiFiClientSecure client;
     client.setCACert(rootCACertificate);
-    // github redirects you to the lastest version if you access ...\latest
+    // github redirects you to the latest version if you access ...\latest
     httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     // lets update the given fw binary url with the latest version
     // TODO: check for proper format of url
     url_fw_bin.replace("<version>", fw_version);
     url_fs_bin.replace("<version>", fw_version);
 
-    // now lets see whether there exits a fs_bin file
+    // now lets see whether there exists a fs_bin file
     HTTPClient https;
     if (https.begin(client, url_fs_bin)) {
         // start connection and send HTTP header

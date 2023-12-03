@@ -14,9 +14,7 @@
 #include "wifi_handler.h"
 #include "webserial_monitor.h"
 #include "ram_log.h"
-
-#include "../../../include/gps_manager.h"
-
+#include "memory_module.h"
 
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
