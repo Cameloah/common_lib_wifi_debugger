@@ -1,5 +1,5 @@
 //
-// Created by Camleoah on 03.03.2022.
+// Created by Cameloah on 03.03.2022.
 //
 
 #pragma once
@@ -27,8 +27,8 @@ typedef  struct {
     IPAddress _subnet;
     IPAddress _primaryDNS;
     IPAddress _secondaryDNS;
-    String ap_name;
-    String device_name;
+    String ap_name;                     // name of the AP when no config found
+    String device_name;                 // name of the AP when config was loaded
 } wifi_info_t;
 
 typedef enum{

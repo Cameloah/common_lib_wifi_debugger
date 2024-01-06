@@ -1,5 +1,5 @@
 //
-// Created by Camleoah on 21/12/2022.
+// Created by Cameloah on 21/12/2022.
 //
 
 #pragma once
@@ -16,26 +16,29 @@ typedef enum{
 } RAM_LOG_ITEM_t;
 
 typedef struct {
-    double timestamp;
+    unsigned long int timestamp;
     RAM_LOG_ITEM_t item_type;
     String payload;
 } ram_log_item_t;
 
-/// adds an entry to the ramlog
-/// \param itemtype what type of message
+/// \brief adds an entry to the ramlog
+///
+/// \param item_type what type of message
 /// \param user_payload error code
-void ram_log_notify(RAM_LOG_ITEM_t itemtype, uint32_t user_payload);
+void ram_log_notify(RAM_LOG_ITEM_t item_type, uint32_t user_payload);
 
-/// adds an entry to the ramlog that can contain a sting
-/// \param itemtype what type of message
+/// \brief adds an entry to the ramlog that can contain a sting
+///
+/// \param item_type what type of message
 /// \param user_payload message string
 /// \param flag_print when set to true, message string will also be printed in console
-void ram_log_notify(RAM_LOG_ITEM_t itemtype, const char* user_payload, bool flag_print = false);
+void ram_log_notify(RAM_LOG_ITEM_t item_type, const char* user_payload, bool flag_print = false);
 
-/// prints the entire ramlog and all entries nicely formatted
+/// \brief prints the entire ramlog and all entries nicely formatted
 void ram_log_print_log();
 
-/// returns the current uptime in a nice string format
+/// \brief returns the current uptime in a nice string format
+///
 /// \param sys_ms current system time such as millis()
 /// \return string of time format
-String ram_log_time_str(long int sys_ms);
+String ram_log_time_str(unsigned long int sys_ms);

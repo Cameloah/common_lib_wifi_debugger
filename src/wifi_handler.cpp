@@ -47,6 +47,7 @@ WIFI_HANDLER_ERROR_t wifi_handler_init() {
 
     else return retval;
 
+    // TODO: put all server services in extra function to also coll properly in main loop
     // initialize modules
 #ifdef SYS_CONTROL_WEBSERIAL
     webserial_monitor_init();
@@ -69,7 +70,7 @@ void wifi_handler_update() {
 
 WIFI_HANDLER_ERROR_t wifi_handler_connect() {
 
-    // if we are in access point mode we dont look for wifi
+    // if we are in access point mode we don't look for Wi-Fi
     if (WiFi.getMode() == 2)
         return WIFI_HANDLER_ERROR_CONNECT;
 
