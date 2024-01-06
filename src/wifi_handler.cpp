@@ -26,12 +26,12 @@ WIFI_HANDLER_ERROR_t wifi_handler_init() {
     // try to load wifi info from wifi manager
     if ((retval = wifi_manager_load(&wifi_info_buffer)) == WIFI_HANDLER_ERROR_NO_ERROR) {
         // we have data, therefore connect normally
-        DualSerial.print("Loaded WiFi: ");
-        DualSerial.println(wifi_info_buffer._ssid);
-        DualSerial.print("With Password: ");
-        DualSerial.println(wifi_info_buffer._password);
-        DualSerial.print("IP-Address: ");
-        DualSerial.println(wifi_info_buffer._local_IP);
+        DualSerial.print("Loaded WiFi: '");
+        DualSerial.print(wifi_info_buffer._ssid); DualSerial.println("'");
+        DualSerial.print("With Password: '");
+        DualSerial.print(wifi_info_buffer._password); DualSerial.println("'");
+        DualSerial.print("IP-Address: '");
+        DualSerial.print(wifi_info_buffer._local_IP); DualSerial.println("'");
 
         // establish connection
         String device_ip = wifi_info_buffer._local_IP.toString();
