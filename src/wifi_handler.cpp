@@ -61,8 +61,8 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device",
 
         wifi_info.getString("deviceName").concat(identifier.c_str());
 
-        // establish connection
-        if ((retval = wifi_handler_connect()) == WIFI_HANDLER_ERROR_CONNECT)
+        // establish connection, spawn AP anyway if wanted
+        if ((retval = wifi_handler_connect()) == WIFI_HANDLER_ERROR_CONNECT || AP_VERBOSITY == 2)
             // we couldn't connect, use AP
             if((retval = wifi_manager_AP(wifi_config.getString("APname"))) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
 
@@ -114,23 +114,29 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     DualSerial.println("Waiting for WiFi");
 
 #ifdef SYS_CONTROL_STAT_IP
-    /* TODO: If it works, remove the following
+
     IPAddress local_IP;
-    local_IP.fromString(*wifi_config.getString("localIP"));
-    */
+    IPAddress gateway;
+    IPAddress subnet;
+    IPAddress primaryDNS;
+    IPAddress secondaryDNS;
 
+    local_IP.fromString(wifi_config.getString("localIP"));
+    gateway.fromString(wifi_config.getString("gateway"));
+    subnet.fromString(wifi_info.getString("subnet"));
+    primaryDNS.fromString(wifi_info.getString("primaryDNS"));
+    secondaryDNS.fromString(wifi_info.getString("secondaryDNS"));
 
-    if (!WiFi.config(IPAddress().fromString(wifi_config.getString("localIP")),
-                     IPAddress().fromString(wifi_config.getString("gateway")),
-                     IPAddress().fromString(wifi_info.getString("subnet")),
-                     IPAddress().fromString(wifi_info.getString("primaryDNS")),
-                     IPAddress().fromString(wifi_info.getString("secondaryDNS")))) {
-        Serial.println("Static IP failed to configure");
+    DualSerial.println("Using static IP...");
+
+    if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
+        DualSerial.println("Static IP failed to configure");
         return WIFI_HANDLER_ERROR_CONFIG;
     }
 #endif
 
     WiFi.begin(wifi_config.getString("ssid").c_str(), wifi_config.getString("password").c_str());
+
     while ((WiFiClass::status() != WL_CONNECTED)) {
         delay(500);
         DualSerial.print(".");
@@ -140,6 +146,13 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
             return WIFI_HANDLER_ERROR_CONNECT;
         }
     }
+
+#ifdef SYS_CONTROL_STAT_IP
+    if(wifi_config.getString("localIP") != WiFi.localIP().toString()) {
+        DualSerial.println("Static IP failed to configure");
+        return WIFI_HANDLER_ERROR_CONFIG;
+    }
+#endif
 
     DualSerial.println("");
     DualSerial.println("WiFi connected");
