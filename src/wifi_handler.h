@@ -6,8 +6,9 @@
 
 #include "ESPAsyncWebServer.h"
 #include "webserial_monitor.h"
+#include "memory_module.h"
 
-#define SYS_CONTROL_STAT_IP
+// #define SYS_CONTROL_STAT_IP
 #define SYS_CONTROL_WEBSERIAL
 
 // set this to any password to protect the AP
@@ -18,18 +19,7 @@
 #define TIMEOUT_WIFI_CONNECT_MS         5000
 
 extern AsyncWebServer server;
-
-typedef struct {
-    String _ssid;
-    String _password;
-    IPAddress _local_IP;
-    IPAddress _gateway;
-    IPAddress _subnet;
-    IPAddress _primaryDNS;
-    IPAddress _secondaryDNS;
-    String ap_name;                     // name of the AP when no config found
-    String device_name;                 // name of the AP when config was loaded
-} wifi_info_t;
+extern MemoryModule wifi_config;
 
 typedef enum{
     WIFI_HANDLER_ERROR_NO_ERROR        = 0x00,
@@ -40,14 +30,12 @@ typedef enum{
     WIFI_HANDLER_ERROR_UNKNOWN         = 0xFF
 } WIFI_HANDLER_ERROR_t;
 
-extern wifi_info_t wifi_info_buffer;
-
 /// Initializes wifi, tries to connect to saved wifi, will setup an access point to input desired
 /// wifi credentials otherwise. activates modules such as github update etc
 /// \param url_version url to latest github release
 /// \param url_bin url to download latest bin file from github
 /// \return error code
-WIFI_HANDLER_ERROR_t wifi_handler_init();
+WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name, const String& device_name);
 
 /// needs to be run periodically to update services
 void wifi_handler_update();

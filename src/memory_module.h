@@ -14,10 +14,12 @@
 #include <memory>
 
 #include "ram_log.h"
+#include "webserial_monitor.h"
 
+/*
 #define EEPROM_SIZE                                 128
 #define TIMEOUT_EEPROM_INIT_MS                      2000
-
+*/
 
 namespace std {
     template<class T>
@@ -192,11 +194,11 @@ public:
     }
 
     void setValue(void *newValue) override {
-        value = String(static_cast<const char *>(newValue));
+        value = *static_cast<String*>(newValue);
     }
 
     void *getValue() const override {
-        return (void *) value.c_str();
+        return (void *) &value;
     }
 
     ParameterType getType() const override { return ParameterType::STRING; }
@@ -252,7 +254,7 @@ public:
     }
 
     // For String
-    void addParameter(const String &key, const String &value) {
+    void addParameter(const String &key, const String &value = (String) "") {
         _parameters.push_back(std::make_unique<ParameterString>(key, value));
     }
 
@@ -326,6 +328,51 @@ public:
         return nullptr; // Or handle the key-not-found case as needed
     }
 
+    int *getInt(const String &key) const {
+        for (const auto &param: _parameters) {
+            if (param->key == key && param->getType() == ParameterType::INT) {
+                return static_cast<int*>(param->getValue());
+            }
+        }
+        return nullptr; // Or handle the key-not-found case as needed
+    }
+
+    float *getFloat(const String &key) const {
+        for (const auto &param: _parameters) {
+            if (param->key == key && param->getType() == ParameterType::FLOAT) {
+                return static_cast<float*>(param->getValue());
+            }
+        }
+        return nullptr; // Or handle the key-not-found case as needed
+    }
+
+    double *getDouble(const String &key) const {
+        for (const auto &param: _parameters) {
+            if (param->key == key && param->getType() == ParameterType::DOUBLE) {
+                return static_cast<double*>(param->getValue());
+            }
+        }
+        return nullptr; // Or handle the key-not-found case as needed
+    }
+
+    String getString(const String &key) const {
+        for (const auto &param: _parameters) {
+            if (param->key == key && param->getType() == ParameterType::STRING) {
+                return *static_cast<String*>(param->getValue());
+            }
+        }
+        return "String not found!"; // Or handle the key-not-found case as needed
+    }
+
+    bool *getBool(const String &key) const {
+        for (const auto &param: _parameters) {
+            if (param->key == key && param->getType() == ParameterType::BOOL) {
+                return static_cast<bool*>(param->getValue());
+            }
+        }
+        return nullptr; // Or handle the key-not-found case as needed
+    }
+
     esp_err_t load(const String &key) {
         if ((class_error = nvs_open("storage", NVS_READONLY, &my_handle)) != ESP_OK)
             return class_error;
@@ -366,20 +413,32 @@ public:
         return class_error;
     }
 
+    esp_err_t loadAllStrict() {
+        if ((class_error = nvs_open("storage", NVS_READONLY, &my_handle)) != ESP_OK)
+            return class_error;
+
+        for (const auto &param: _parameters) {
+            if ((class_error = param->load(my_handle)) != ESP_OK)
+                break;
+        }
+        nvs_close(my_handle);
+        return class_error;
+    }
+
 private:
     std::vector<std::unique_ptr<Parameter>> _parameters;
     esp_err_t class_error;
     nvs_handle my_handle;
 };
 
+void memory_module_init1();
+
+/*        ***** LEGACY *****
 
 /// \brief initializes the memory module. can timout
 ///
 /// \return error status
 MEMORY_MODULE_ERROR_t memory_module_init();
-
-void memory_module_init1();
-
 
 /// \brief write number to eeprom
 ///
@@ -410,3 +469,5 @@ int EEPROM_readAnything(int ee, T &value) {
         *p++ = EEPROM.read(ee++);
     return i;
 }
+
+*/

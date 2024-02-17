@@ -6,6 +6,7 @@
 #include "webserial_monitor.h"
 #include "network_ota.h"
 #include "wifi_manager.h"
+#include "memory_module.h"
 #include "../../../include/tools/loop_timer.h"
 
 /*
@@ -15,51 +16,87 @@
  */
 
 // object that will contain the credential data for the current wifi
-wifi_info_t wifi_info_buffer;
+MemoryModule wifi_config;
+MemoryModule wifi_info;
 
 int timer_wifi_connect = 0;
 AsyncWebServer server(80);
 
-WIFI_HANDLER_ERROR_t wifi_handler_init() {
+WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device", const String& device_name = "ESP-Device No. ") {
     WIFI_HANDLER_ERROR_t retval = WIFI_HANDLER_ERROR_UNKNOWN;
 
-    // try to load wifi info from wifi manager
-    if ((retval = wifi_manager_load(&wifi_info_buffer)) == WIFI_HANDLER_ERROR_NO_ERROR) {
+    // lets populate the wifi_config object with empty parameters
+    wifi_config.addParameter("ssid");
+    wifi_config.addParameter("password");
+    wifi_config.addParameter("localIP");
+    wifi_config.addParameter("gateway");
+
+    // the wifi_info object will contain general information such as identification
+    wifi_info.addParameter("APname");
+    wifi_info.addParameter("deviceName");
+    wifi_info.addParameter("subnet", (String) "255.255.255.0");
+    wifi_info.addParameter("primaryDNS", (String) "8.8.8.8");
+    wifi_info.addParameter("secondaryDNS", (String) "8.8.4.4");
+
+    wifi_info.set("APname", ap_name);
+    wifi_info.set("deviceName", device_name);
+
+    //DualSerial.println(*static_cast<String*>(wifi_info.get("subnet")));
+    //DualSerial.println(wifi_info.getString("APname"));
+    //DualSerial.println(wifi_info.getString("deviceName"));
+
+
+
+    // try to load wifi config and credentials from wifi manager
+    if ((retval = wifi_manager_load(&wifi_config)) == WIFI_HANDLER_ERROR_NO_ERROR) {
         // we have data, therefore connect normally
-        DualSerial.print("Loaded WiFi: ");
-        DualSerial.println(wifi_info_buffer._ssid);
-        DualSerial.print("With Password: ");
-        DualSerial.println(wifi_info_buffer._password);
-        DualSerial.print("IP-Address: ");
-        DualSerial.println(wifi_info_buffer._local_IP);
+        String output = "Loaded WiFi: '" + wifi_config.getString("ssid") + "'\n" +
+                "With Password: '" + wifi_config.getString("password") + "'\n" +
+                "IP-Address: " + wifi_config.getString("localIP") + "\n";
+        DualSerial.println(output);
+
+        // redefine device name to add a unique number
+        std::string device_ip = wifi_config.getString("localIP").c_str();
+        std::string identifier = device_ip.substr(device_ip.rfind('.') + 1);
+
+        wifi_info.getString("deviceName").concat(identifier.c_str());
 
         // establish connection
-        String device_ip = wifi_info_buffer._local_IP.toString();
-        wifi_info_buffer.device_name.concat(device_ip[device_ip.length() - 1]);
         if ((retval = wifi_handler_connect()) == WIFI_HANDLER_ERROR_CONNECT)
-            if((retval = wifi_manager_AP(wifi_info_buffer.device_name)) != WIFI_HANDLER_ERROR_NO_ERROR) return retval; // we couldnt connect, use AP
+            // we couldn't connect, use AP
+            if((retval = wifi_manager_AP(wifi_config.getString("APname"))) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
 
     }
+
     // if no config we need an access point
     else if (retval == WIFI_HANDLER_ERROR_CONFIG) {
-        if((retval = wifi_manager_AP(wifi_info_buffer.ap_name)) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
+        if((retval = wifi_manager_AP(wifi_info.getString("APname"))) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
     }
 
     else return retval;
 
-    // TODO: put all server services in extra function to also coll properly in main loop
-    // initialize modules
+
+    // *****----- SERVER MODULES -----*****
+
+    // TODO: put all server services in extra function to also call properly in main loop
+    // Systems that do not need SPIFFS
 #ifdef SYS_CONTROL_WEBSERIAL
     webserial_monitor_init();
 #endif
 
     network_ota_init();
 
+    // now lets initialize spiffs
+    if(!SPIFFS.begin(true)){
+        return WIFI_HANDLER_ERROR_SPIFFS;
+    }
+
     server.serveStatic("/", SPIFFS, "/");
     server.on("/wifi", HTTP_GET, webfct_wifi_get);
     server.on("/", HTTP_POST, webfct_wifi_post);
 
     server.begin();
+
     return retval;
 }
 
@@ -77,13 +114,23 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     DualSerial.println("Waiting for WiFi");
 
 #ifdef SYS_CONTROL_STAT_IP
-    if (!WiFi.config(wifi_info_buffer._local_IP, wifi_info_buffer._gateway, wifi_info_buffer._subnet, wifi_info_buffer._primaryDNS, wifi_info_buffer._secondaryDNS)) {
+    /* TODO: If it works, remove the following
+    IPAddress local_IP;
+    local_IP.fromString(*wifi_config.getString("localIP"));
+    */
+
+
+    if (!WiFi.config(IPAddress().fromString(wifi_config.getString("localIP")),
+                     IPAddress().fromString(wifi_config.getString("gateway")),
+                     IPAddress().fromString(wifi_info.getString("subnet")),
+                     IPAddress().fromString(wifi_info.getString("primaryDNS")),
+                     IPAddress().fromString(wifi_info.getString("secondaryDNS")))) {
         Serial.println("Static IP failed to configure");
         return WIFI_HANDLER_ERROR_CONFIG;
     }
 #endif
 
-    WiFi.begin(wifi_info_buffer._ssid.c_str(), wifi_info_buffer._password.c_str());
+    WiFi.begin(wifi_config.getString("ssid").c_str(), wifi_config.getString("password").c_str());
     while ((WiFiClass::status() != WL_CONNECTED)) {
         delay(500);
         DualSerial.print(".");
@@ -98,6 +145,11 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     DualSerial.println("WiFi connected");
     DualSerial.println("IP-address: ");
     DualSerial.println(WiFi.localIP());
+
+#ifndef SYS_CONTROL_STAT_IP
+    // if we got the IP from the DNS, lets save the ip in the memory buffer
+    // wifi_config.set("localIP", WiFi.localIP().toString());
+#endif
 
     return WIFI_HANDLER_ERROR_NO_ERROR;
 }

@@ -18,7 +18,7 @@ void memory_module_init1() {
     config_data.addParameter("name", (String) "erster test");
     config_data.addParameter("flag_autostart", true);
 
-    config_data.saveAll();
+    // config_data.saveAll();
 
     int* timeout = static_cast<int*>(config_data.get("timeout_boot"));
     if (timeout == nullptr) {
@@ -36,6 +36,7 @@ void memory_module_init1() {
 
 }
 
+/*
 MEMORY_MODULE_ERROR_t memory_module_init() {
     uint32_t counter_init_timeout = 0;
 
@@ -49,6 +50,7 @@ MEMORY_MODULE_ERROR_t memory_module_init() {
 
     return MEMORY_MODULE_ERROR_NO_ERROR;
 }
+*/
 
 esp_err_t initialize_nvs() {
     static bool isInitialized = false;

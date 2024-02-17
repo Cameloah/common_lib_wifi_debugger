@@ -5,6 +5,8 @@
 #pragma once
 
 #include "wifi_handler.h"
+#include "memory_module.h"
+
 
 /// \brief get callback for page /wifi
 ///
@@ -20,13 +22,13 @@ void webfct_wifi_post(AsyncWebServerRequest *request);
 ///
 /// \param user_buffer user provided buffer to save wifi configuration
 /// \return WIFI_HANDLER_ERROR_t error code
-WIFI_HANDLER_ERROR_t wifi_manager_load(wifi_info_t* user_buffer);
+WIFI_HANDLER_ERROR_t wifi_manager_load(MemoryModule* user_config);
 
 /// \brief setup and start an access point for users to log on and set up the device
 ///
 /// /// \param ap_name name of the device when in access point mode
 /// \return WIFI_HANDLER_ERROR_t error code
-WIFI_HANDLER_ERROR_t wifi_manager_AP(String ap_name);
+WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name);
 
 /// \brief needs to be run periodically
 void wifi_manager_update();
