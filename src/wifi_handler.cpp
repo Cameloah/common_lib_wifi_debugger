@@ -41,12 +41,6 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device",
     wifi_info.set("APname", ap_name);
     wifi_info.set("deviceName", device_name);
 
-    //DualSerial.println(*static_cast<String*>(wifi_info.get("subnet")));
-    //DualSerial.println(wifi_info.getString("APname"));
-    //DualSerial.println(wifi_info.getString("deviceName"));
-
-
-
     // try to load wifi config and credentials from wifi manager
     if ((retval = wifi_manager_load(&wifi_config)) == WIFI_HANDLER_ERROR_NO_ERROR) {
         // we have data, therefore connect normally
