@@ -94,6 +94,7 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
     ram_log_notify(RAM_LOG_INFO, payload.c_str(), true);
     // nullptr sets an open Access Point
 
+    WiFi.enableAP(true);
     if(!WiFi.softAP(ap_name.c_str(), AP_PASSWORD))
         return WIFI_HANDLER_ERROR_AP;
 
@@ -102,7 +103,9 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
 
     // if DNSServer is started with "*" for domain name, it will reply with
     // provided IP to all DNS request
-    dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
+
+    //TODO: dns server causes crash on esp32 devkit v1
+    // dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
     // Web Server Root URL
     server.onNotFound(webfct_wifi_get);
@@ -113,7 +116,8 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
 
 void wifi_manager_update() {
     if (flag_ap_active)
-        dnsServer.processNextRequest();
+        return;
+        //dnsServer.processNextRequest();
 
 #ifdef AP_TIMEOUT
     if (flag_ap_active && millis() > AP_TIMEOUT) {
