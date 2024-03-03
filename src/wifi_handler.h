@@ -17,7 +17,7 @@
 // AP verbosity:
 // 1 - AP will spawn if esp cannot connect to existing wifi for any reason
 // 2 - AP will always spawn, even if connected to existing wifi
-#define AP_VERBOSITY                    2
+#define AP_VERBOSITY                    1
 
 // comment this out to have an always on AP once its spawned
 // #define AP_TIMEOUT                      300000      // 5 min
