@@ -47,24 +47,52 @@ void ram_log_notify(RAM_LOG_ITEM_t item_type, const char *user_payload, bool fla
     _ringbuffer_item_count = (_ringbuffer_item_count > RAM_LOG_RINGBUFFER_LEN) ? RAM_LOG_RINGBUFFER_LEN : _ringbuffer_item_count+1;
 }
 
-void ram_log_print_log() {
-    DualSerial.printf("Log items: %d\n", _ringbuffer_item_count);
+void ram_log_print_log() {   
+    // Pre-allocate a large enough String object to avoid frequent reallocations.
+    // NOTE: Adjust the initial size based on your needs and available memory.
+    String payload;
+    payload.reserve(5000); // Example size, adjust based on expected log size
+
+    payload += "Log items: ";
+    payload += String(_ringbuffer_item_count);
+    payload += '\n';
 
     for (int item = 0; item < _ringbuffer_item_count; ++item) {
-        unsigned long int seconds = _ringbuffer[item].timestamp / 1000;
-        uint16_t ms = (long int) _ringbuffer[item].timestamp % 1000;
-        uint8_t sec = seconds % 60;		seconds /= 60;
-        uint8_t min = seconds % 60;		seconds /= 60;
-        uint8_t hrs = seconds % 24;     seconds /= 24;
-        uint16_t d = seconds;
-        DualSerial.printf("%dd:%dh:%dm:%ds:%dms ", d, hrs, min, sec, ms);
-        if (_ringbuffer[item].item_type == RAM_LOG_INFO)
-            DualSerial.print("INFO: ");
-        else
-            DualSerial.printf("ERROR: %d - ", _ringbuffer[item].item_type);
-        DualSerial.println(_ringbuffer[item].payload.c_str());
-        delay(500);
+        unsigned long seconds = _ringbuffer[item].timestamp / 1000;
+        uint16_t ms = _ringbuffer[item].timestamp % 1000;
+        uint8_t sec = seconds % 60; seconds /= 60;
+        uint8_t min = seconds % 60; seconds /= 60;
+        uint8_t hrs = seconds % 24; seconds /= 24;
+        uint16_t days = seconds;
+
+        // Build the timestamp string
+        payload += days;
+        payload += "d:";
+        payload += hrs;
+        payload += "h:";
+        payload += min;
+        payload += "m:";
+        payload += sec;
+        payload += "s:";
+        payload += ms;
+        payload += "ms ";
+
+        // Append log level and message
+        if (_ringbuffer[item].item_type == RAM_LOG_INFO) {
+            payload += "INFO: ";
+        } else {
+            payload += "ERROR: ";
+            payload += _ringbuffer[item].item_type;
+            payload += " ";
+        }
+
+        // Append the log message and a newline
+        payload += _ringbuffer[item].payload;
+        payload += '\n';
     }
+
+    // Print the entire log at once
+    DualSerial.println(payload);
 }
 
 String ram_log_time_str(unsigned long int sys_ms) {
