@@ -26,6 +26,7 @@
 
 extern AsyncWebServer server;
 extern MemoryModule wifi_config;
+extern MemoryModule wifi_info;
 
 typedef enum{
     WIFI_HANDLER_ERROR_NO_ERROR        = 0x00,

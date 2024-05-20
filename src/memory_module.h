@@ -60,7 +60,8 @@ typedef enum {
     MEMORY_MODULE_ERROR_NO_ERROR = 0x00,
     MEMORY_MODULE_ERROR_INIT = 0x01,
     MEMORY_MODULE_ERROR_NO_MEM = 0x02,
-    MEMORY_MODULE_ERROR_NOT_FOUND = 0x03,
+    MEMORY_MODULE_ERROR_SET_NOT_FOUND = 0x03,
+    MEMORY_MODULE_ERROR_LOAD_NOT_FOUND = 0x04,
     MEMORY_MODULE_ERROR_UNKNOWN = 0xFF
 } MEMORY_MODULE_ERROR_t;
 
@@ -316,6 +317,8 @@ public:
                 break;
             }
         }
+        if (class_error == ESP_ERR_NOT_FOUND)
+            setKeyNotFound(key);
         return class_error;
     }
 
@@ -325,6 +328,7 @@ public:
                 return param->getValue();
             }
         }
+        loadKeyNotFound(key);
         return nullptr; // Or handle the key-not-found case as needed
     }
 
@@ -334,6 +338,7 @@ public:
                 return static_cast<int*>(param->getValue());
             }
         }
+        loadKeyNotFound(key);
         return nullptr; // Or handle the key-not-found case as needed
     }
 
@@ -343,6 +348,7 @@ public:
                 return static_cast<float*>(param->getValue());
             }
         }
+        loadKeyNotFound(key);
         return nullptr; // Or handle the key-not-found case as needed
     }
 
@@ -352,6 +358,7 @@ public:
                 return static_cast<double*>(param->getValue());
             }
         }
+        loadKeyNotFound(key);
         return nullptr; // Or handle the key-not-found case as needed
     }
 
@@ -361,6 +368,7 @@ public:
                 return *static_cast<String*>(param->getValue());
             }
         }
+        loadKeyNotFound(key);
         return "String not found!"; // Or handle the key-not-found case as needed
     }
 
@@ -370,6 +378,7 @@ public:
                 return static_cast<bool*>(param->getValue());
             }
         }
+        loadKeyNotFound(key);
         return nullptr; // Or handle the key-not-found case as needed
     }
 
@@ -386,6 +395,8 @@ public:
             }
         }
         nvs_close(my_handle);
+        if (class_error == ESP_ERR_NOT_FOUND)
+            loadKeyNotFound(key);
         return class_error;
     }
 
@@ -429,6 +440,14 @@ private:
     std::vector<std::unique_ptr<Parameter>> _parameters;
     esp_err_t class_error;
     nvs_handle my_handle;
+
+    void setKeyNotFound(const String &key) const {
+        ram_log_notify(RAM_LOG_ERROR_MEMORY, MEMORY_MODULE_ERROR_SET_NOT_FOUND, String("Parameter: '" + key + "'").c_str());
+    }
+
+    void loadKeyNotFound(const String &key) const {
+        ram_log_notify(RAM_LOG_ERROR_MEMORY, MEMORY_MODULE_ERROR_LOAD_NOT_FOUND, String("Parameter: '" + key + "'").c_str());
+    }
 };
 
 void memory_module_init1();

@@ -8,17 +8,17 @@
 #include "memory_module.h"
 
 
-/// \brief get callback for page /wifi
+/// \brief get callback for page /wifi. serves page
 ///
 /// \param request incoming request
 void webfct_wifi_get(AsyncWebServerRequest *request);
 
-/// \brief post callback for page /wifi
+/// \brief post callback for page /wifi. saves and applies incoming user wifi credentials
 ///
 /// \param request incoming request
 void webfct_wifi_post(AsyncWebServerRequest *request);
 
-/// \brief loads saved wifi configuration if available
+/// \brief loads saved wifi configuration if available. checks for non-meaningful credentials
 ///
 /// \param user_buffer user provided buffer to save wifi configuration
 /// \return WIFI_HANDLER_ERROR_t error code

@@ -1,5 +1,7 @@
 //
 // Created by Cameloah on 31.03.2023.
+// The wifi manager provides an interface to setup and configure the wifi network, the esp is connecting to. 
+// In the future, it should be able to store multipe sets of wifi credentials, show available networks and give the option for static or dynamic IP addresses. 
 //
 
 #include <Arduino.h>
@@ -15,15 +17,18 @@
 #include "webserial_monitor.h"
 #include "ram_log.h"
 #include "memory_module.h"
+#include "lib_tools.h"
 
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 
 // Search for parameter in HTTP POST request
-const char* PARAM_INPUT_1 = "ssid";
-const char* PARAM_INPUT_2 = "pass";
-const char* PARAM_INPUT_3 = "ip";
-const char* PARAM_INPUT_4 = "gateway";
+const char* GENERAL_INPUT_1 = "Device Name";
+
+const char* WIFI_INPUT_1 = "ssid";
+const char* WIFI_INPUT_2 = "pass";
+const char* WIFI_INPUT_3 = "ip";
+const char* WIFI_INPUT_4 = "gateway";
 
 String ip_default = "192.168.2.73";
 
@@ -39,31 +44,35 @@ void webfct_wifi_post(AsyncWebServerRequest *request) {
     for(int i=0;i<params;i++){
         AsyncWebParameter* p = request->getParam(i);
         if(p->isPost()){
-            // HTTP POST ssid value
-            if (p->name() == PARAM_INPUT_1) {
-                //*wifi_config.getString("ssid") = p->value().c_str();
-                wifi_config.set("ssid", p->value(), true);
-                //strcpy(reinterpret_cast<char *>(wifi_config.getString("ssid")), p->value().c_str()); //ssid = p->value().c_str();
-                DualSerial.print("SSID set to: ");
-                DualSerial.println(wifi_config.getString("ssid"));
+            // save general settings
+            if (p->name() == GENERAL_INPUT_1) {
+                wifi_info.set("deviceName", p->value(), true);
+                DualSerial.print("Device name set to: ");
+                DualSerial.println(p->value());
             }
-            // HTTP POST pass value
-            if (p->name() == PARAM_INPUT_2) {
+            // save wifi settings
+            if (p->name() == WIFI_INPUT_1) {
+                wifi_config.set("ssid", p->value(), true);
+                DualSerial.print("SSID set to: ");
+                DualSerial.println(p->value());
+            }
+    
+            if (p->name() == WIFI_INPUT_2) {
                 wifi_config.set("password", p->value(), true);
                 DualSerial.print("Password set to: ");
-                DualSerial.println(wifi_config.getString("password"));
+                DualSerial.println(p->value());
             }
-            // HTTP POST ip value
-            if (p->name() == PARAM_INPUT_3) {
+            
+            if (p->name() == WIFI_INPUT_3) {
                 wifi_config.set("localIP", p->value(), true);
                 DualSerial.print("IP Address set to: ");
-                DualSerial.println(wifi_config.getString("localIP"));
+                DualSerial.println(p->value());
             }
-            // HTTP POST gateway value
-            if (p->name() == PARAM_INPUT_4) {
+
+            if (p->name() == WIFI_INPUT_4) {
                 wifi_config.set("gateway", p->value(), true);
                 DualSerial.print("Gateway set to: ");
-                DualSerial.println(wifi_config.getString("gateway"));
+                DualSerial.println(p->value());
             }
         }
     }
@@ -78,16 +87,15 @@ WIFI_HANDLER_ERROR_t wifi_manager_load(MemoryModule* user_config) {
     if (user_config->loadAllStrict() != ESP_OK)
         return WIFI_HANDLER_ERROR_CONFIG;
 
-    /*
-    if(!strcmp((const char *) user_config->getString("ssid"), "") || !strcmp((const char *) user_config->getString("password"), "")){
-        // we loaded empty credentials, therefore fail
+    // lets check for meaningful credentials
+    if(!otherThanWhitespace(user_config->getString("ssid")) || !otherThanWhitespace(user_config->getString("password")))
         return WIFI_HANDLER_ERROR_CONFIG;
-    }
-*/
+
     flag_wifi_config_loaded = true;
     return WIFI_HANDLER_ERROR_NO_ERROR;
 }
 
+//TODO: does not belong here. move to wifi handler
 WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
     // Connect to Wi-Fi network with SSID and password
     String payload = "Starting Access Point: " + ap_name;
@@ -98,8 +106,8 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
     if(!WiFi.softAP(ap_name.c_str(), AP_PASSWORD))
         return WIFI_HANDLER_ERROR_AP;
 
-    DualSerial.print("AP IP address: ");
-    DualSerial.println(WiFi.softAPIP());
+    payload = "AP active. IP: " + WiFi.softAPIP().toString() + ", Wifi mode: " + wifi_handler_get_mode();
+    ram_log_notify(RAM_LOG_INFO, payload.c_str(), true);
 
     // if DNSServer is started with "*" for domain name, it will reply with
     // provided IP to all DNS request

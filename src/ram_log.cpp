@@ -11,21 +11,35 @@ uint8_t _ringbuffer_item_index = 0;
 uint8_t _ringbuffer_item_count = 0;
 
 
-void ram_log_notify(RAM_LOG_ITEM_t item_type, uint32_t user_payload) {
+void ram_log_notify(RAM_LOG_ITEM_t item_type, uint32_t module_error) {
     // save timestamp
     _ringbuffer[_ringbuffer_item_index].timestamp = millis();
     // save item type
     _ringbuffer[_ringbuffer_item_index].item_type = item_type;
     // save payload as string
     switch (item_type) {
-        case RAM_LOG_ERROR_MEMORY:
-            _ringbuffer[_ringbuffer_item_index].payload = esp_err_to_name(user_payload);
-            break;
+        // TODO: write proper parser
+        // case RAM_LOG_ERROR_MEMORY:
+        //     _ringbuffer[_ringbuffer_item_index].payload = esp_err_to_name(user_payload);
+        //     break;
 
         default:
-            _ringbuffer[_ringbuffer_item_index].payload = String(user_payload);
+            _ringbuffer[_ringbuffer_item_index].payload = String(module_error);
 
     }
+
+    // increase item index
+    _ringbuffer_item_index = (_ringbuffer_item_index + 1) % RAM_LOG_RINGBUFFER_LEN;
+    _ringbuffer_item_count = (_ringbuffer_item_count > RAM_LOG_RINGBUFFER_LEN) ? RAM_LOG_RINGBUFFER_LEN : _ringbuffer_item_count+1;
+}
+
+void ram_log_notify(RAM_LOG_ITEM_t item_type, uint32_t module_error, const char *user_payload) {
+    // save timestamp
+    _ringbuffer[_ringbuffer_item_index].timestamp = millis();
+    // save item type
+    _ringbuffer[_ringbuffer_item_index].item_type = item_type;
+    // save payload as string
+    _ringbuffer[_ringbuffer_item_index].payload = String(module_error) + ", " + String(user_payload);
 
     // increase item index
     _ringbuffer_item_index = (_ringbuffer_item_index + 1) % RAM_LOG_RINGBUFFER_LEN;
@@ -80,7 +94,13 @@ void ram_log_print_log() {
         // Append log level and message
         if (_ringbuffer[item].item_type == RAM_LOG_INFO) {
             payload += "INFO: ";
-        } else {
+        }
+
+        else if (_ringbuffer[item].item_type == RAM_LOG_WARNING) {
+            payload += "WARNING: ";
+        } 
+        
+        else {
             payload += "ERROR: ";
             payload += _ringbuffer[item].item_type;
             payload += " ";
