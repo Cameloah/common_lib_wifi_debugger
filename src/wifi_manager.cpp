@@ -13,7 +13,7 @@
 #include "EEPROM.h"
 
 #include "wifi_manager.h"
-#include "wifi_handler.h"
+#include "main_project_utils.h"
 #include "webserial_monitor.h"
 #include "ram_log.h"
 #include "memory_module.h"

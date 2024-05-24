@@ -42,7 +42,7 @@ typedef enum{
 /// \param url_version url to latest github release
 /// \param url_bin url to download latest bin file from github
 /// \return error code
-WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name, const String& device_name);
+WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name);
 
 /// needs to be run periodically to update services
 void wifi_handler_update();

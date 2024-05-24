@@ -2,7 +2,7 @@
 #include <ESPAsyncWebServer.h>
 #include "SPIFFS.h"
 
-#include "wifi_handler.h"
+#include "main_project_utils.h"
 #include "webserial_monitor.h"
 #include "network_ota.h"
 #include "wifi_manager.h"
@@ -40,11 +40,28 @@ void webfct_get_wifi_cred(AsyncWebServerRequest *request) {
 void webfct_get_general_config(AsyncWebServerRequest *request) {
 
     String payload = wifi_info.getString("deviceName") + "\n";
-    
     request->send(200, "text/plain", payload);
 }
 
-WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device", const String& device_name = "ESP-Device No. ") {
+void webfct_get_settings(AsyncWebServerRequest *request) {request->send(SPIFFS, "/settings.html", "text/html");}
+
+void webfct_settings_post(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len,  size_t total) {
+    String payload = String((char*)data);
+    int pos = payload.indexOf('=');
+    if (pos != -1) { // Make sure '=' is found in the string
+        String valueStr = payload.substring(pos + 1);
+
+        // Step 3: Convert the value to a boolean
+        bool value = (valueStr == "true");  // Assumes the string is exactly "true" or anything else is false
+
+        // Use the boolean value as needed
+        DualSerial.print("Boolean value: ");
+        DualSerial.println(value);
+    }
+}
+
+
+WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device") {
     WIFI_HANDLER_ERROR_t retval = WIFI_HANDLER_ERROR_UNKNOWN;
 
     // lets populate the wifi_config object with empty parameters
@@ -61,8 +78,12 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device",
     wifi_info.addParameter("secondaryDNS", (String) "8.8.4.4");
 
     // load wifi info
-    if (wifi_info.load("deviceName") != ESP_OK)
+    if (wifi_info.load("deviceName") != ESP_OK) {
+        // name does not exist yet. generate one
+        String device_name = ap_name + " " + String(random(100, 1000));
         wifi_info.set("deviceName", device_name);
+    }
+        
 
     wifi_info.set("APname", ap_name);
 
@@ -74,18 +95,12 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device",
                 "IP-Address: " + wifi_config.getString("localIP") + "\n";
         DualSerial.println(output);
 
-        // redefine device name to add a unique number
-        // TODO: user should provide a device-name in the webpage
         std::string device_ip = wifi_config.getString("localIP").c_str();
-        std::string identifier = device_ip.substr(device_ip.rfind('.') + 1);
-
-        wifi_info.getString("deviceName").concat(identifier.c_str());
 
         // establish connection, spawn AP anyway if wanted
         if ((retval = wifi_handler_connect()) == WIFI_HANDLER_ERROR_CONNECT || AP_VERBOSITY == 2)
             // we couldn't connect, use AP
             if((retval = wifi_manager_AP(wifi_info.getString("APname"))) != WIFI_HANDLER_ERROR_NO_ERROR) return retval;
-
     }
 
     // if no config we need an access point
@@ -116,22 +131,8 @@ WIFI_HANDLER_ERROR_t wifi_handler_init(const String& ap_name = "New ESP-Device",
     server.on("/", HTTP_POST, webfct_wifi_post);                                                                                        // listens for POST requests and saves user wifi credentials
     server.on("/wifi-config", HTTP_GET, webfct_get_wifi_cred);                                                                          // serves wifi credentials requested by /wifi config page
     server.on("/general-config", HTTP_GET, webfct_get_general_config);                                                                  // serves general configuration
-    server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request) {request->send(SPIFFS, "/settings.html", "text/html");});       // serves /settings page
-    server.on("/settings", HTTP_POST, [](AsyncWebServerRequest *request) {},                                                            // listens for settings POST requests and executes settings
-    [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len,  size_t total) {
-        String payload = String((char*)data);
-        int pos = payload.indexOf('=');
-        if (pos != -1) { // Make sure '=' is found in the string
-            String valueStr = payload.substring(pos + 1);
-
-            // Step 3: Convert the value to a boolean
-            bool value = (valueStr == "true");  // Assumes the string is exactly "true" or anything else is false
-
-            // Use the boolean value as needed
-            DualSerial.print("Boolean value: ");
-            DualSerial.println(value);
-        }
-    });
+    server.on("/settings", HTTP_GET, webfct_get_settings);
+    server.on("/settings", HTTP_POST, [](AsyncWebServerRequest *request) {}, webfct_settings_post);
 
     server.begin();
 
@@ -195,11 +196,6 @@ WIFI_HANDLER_ERROR_t wifi_handler_connect() {
     DualSerial.println("");
     String payload = "Connected to " + wifi_config.getString("ssid") + ", IP: " + WiFi.localIP().toString() + ", Wifi mode: " + wifi_handler_get_mode();
     ram_log_notify(RAM_LOG_INFO, payload.c_str(), true);
-
-#ifndef SYS_CONTROL_STAT_IP
-    // if we got the IP from the DNS, lets save the ip in the memory buffer
-    // wifi_config.set("localIP", WiFi.localIP().toString());
-#endif
 
     return WIFI_HANDLER_ERROR_NO_ERROR;
 }
