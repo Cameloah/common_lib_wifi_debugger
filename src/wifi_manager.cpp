@@ -113,10 +113,12 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
     // provided IP to all DNS request
 
     //TODO: dns server causes crash on esp32 devkit v1
-    // dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
+    dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
     // Web Server Root URL
-    server.onNotFound(webfct_wifi_get);
+    server.onNotFound([](AsyncWebServerRequest *request) {
+        request->redirect("/wifimanager.html");
+    });
 
     flag_ap_active = true;
     return WIFI_HANDLER_ERROR_NO_ERROR;
@@ -124,8 +126,8 @@ WIFI_HANDLER_ERROR_t wifi_manager_AP(const String& ap_name) {
 
 void wifi_manager_update() {
     if (flag_ap_active)
-        return;
-        //dnsServer.processNextRequest();
+        dnsServer.processNextRequest();
+        
 
 #ifdef AP_TIMEOUT
     if (flag_ap_active && millis() > AP_TIMEOUT) {
