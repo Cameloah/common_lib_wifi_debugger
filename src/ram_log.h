@@ -11,7 +11,7 @@
 typedef enum{
     RAM_LOG_INFO                        = 0x00,
     RAM_LOG_WARNING                     = 0x01,
-    RAM_LOG_ERROR_WIFI_HANDLER          = 0x02,
+    RAM_LOG_ERROR_NETWORK_MANAGER       = 0x02,
     RAM_LOG_ERROR_GITHUB_UPDATE         = 0x03,
     RAM_LOG_ERROR_MEMORY                = 0x04,
     RAM_LOG_ERROR_GPS_MANAGER           = 0x05,
