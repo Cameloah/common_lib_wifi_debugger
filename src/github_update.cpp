@@ -83,7 +83,8 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version) 
     return github_update_firmwareUpdate();
 }
 
-GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
+    
     // if wifi not connected, cancel early
     if (WiFi.status() != WL_CONNECTED) {
         DualSerial.println("Wifi is not connected");
@@ -113,7 +114,7 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
                 // lets extract the FW version from the url
                 fw_version = location.substring(location.indexOf("/releases/tag/") + 14);
             } else {
-                DualSerial.print("error in downloading version file:");
+                DualSerial.print("error in downloading version file: ");
                 DualSerial.println(httpCode);
                 return GITHUB_UPDATE_ERROR_HTTP;
             }
@@ -125,6 +126,9 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
     if (httpCode == HTTP_CODE_FOUND) // if version received
     {
         fw_version.trim();
+        if (!ret_version.isEmpty())
+            ret_version = fw_version;
+
         // extract firmware numbers
         String fw_version_latest = fw_version;
         uint8_t fw_latest_major = atoi(strtok((char *) fw_version_latest.c_str(), "v.\n"));
@@ -143,8 +147,12 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest() {
         } else {
             DualSerial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
                           FW_VERSION_MAJOR, FW_VERSION_MINOR, FW_VERSION_PATCH);
+            if (!ret_version.isEmpty())
+                ret_version = "0";
             return GITHUB_UPDATE_ERROR_NO_UPDATE;
         }
+        if (!ret_version.isEmpty())
+            ret_version = fw_version;
         return GITHUB_UPDATE_ERROR_NO_ERROR;
     }
     return GITHUB_UPDATE_ERROR_HTTP;

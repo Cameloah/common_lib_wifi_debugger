@@ -123,13 +123,13 @@ NETWORK_MANAGER_ERROR_t _wifi_load(MemoryModule* user_config) {
     if (user_config->loadAllStrict() != ESP_OK)
         return NETWORK_MANAGER_ERROR_CONFIG;
 
-    // lets check for meaningful credentials
-    if(!otherThanWhitespace(user_config->getString("ssid")) || !otherThanWhitespace(user_config->getString("password")))
-        return NETWORK_MANAGER_ERROR_CONFIG;
+         // lets check for meaningful credentials
+        if(!otherThanWhitespace(user_config->getString("ssid")) || !otherThanWhitespace(user_config->getString("password")))
+            return NETWORK_MANAGER_ERROR_CONFIG;
 
-    flag_wifi_config_loaded = true;
-    return NETWORK_MANAGER_ERROR_NO_ERROR;
-}
+        flag_wifi_config_loaded = true;
+        return NETWORK_MANAGER_ERROR_NO_ERROR;
+    }
 
 NETWORK_MANAGER_ERROR_t _wifi_manager_AP(const String& ap_name) {
     // Connect to Wi-Fi network with SSID and password
@@ -148,7 +148,7 @@ NETWORK_MANAGER_ERROR_t _wifi_manager_AP(const String& ap_name) {
 
     // Web Server Root URL
     server.onNotFound([](AsyncWebServerRequest *request) {
-        request->redirect("/wifimanager.html");
+        request->redirect("/settings.html");
     });
 
     flag_ap_active = true;
@@ -194,7 +194,7 @@ NETWORK_MANAGER_ERROR_t network_manager_init(const String& ap_name) {
         // establish connection, spawn AP anyway if wanted
         if ((retval = wifi_connect()) == NETWORK_MANAGER_ERROR_CONNECT || AP_VERBOSITY == 2)
             // we couldn't connect, use AP
-            if((retval = _wifi_manager_AP(wifi_info.getString("APname"))) != NETWORK_MANAGER_ERROR_NO_ERROR) return retval;
+            if((retval = _wifi_manager_AP(wifi_info.getString("deviceName"))) != NETWORK_MANAGER_ERROR_NO_ERROR) return retval;
     }
 
     // if no config we need an access point

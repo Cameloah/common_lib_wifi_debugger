@@ -30,7 +30,7 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version);
 
 /// Checks for the latest release version on a github repository and compares to current version
 /// \return GITHUB_UPDATE_ERROR_t status if new version is available
-GITHUB_UPDATE_ERROR_t github_update_checkforlatest();
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version = "");
 
 /// Initializes the github update module
 void github_update_init();

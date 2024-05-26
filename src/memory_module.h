@@ -429,8 +429,11 @@ public:
             return class_error;
 
         for (const auto &param: _parameters) {
-            if ((class_error = param->load(my_handle)) != ESP_OK)
+            if ((class_error = param->load(my_handle)) != ESP_OK) {
+                if (class_error == ESP_ERR_NOT_FOUND)
+                    loadKeyNotFound(param->key);
                 break;
+            }
         }
         nvs_close(my_handle);
         return class_error;
