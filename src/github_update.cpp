@@ -18,7 +18,8 @@ String fw_version;
 GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate() {
     // initiate wifi update client
     WiFiClientSecure client;
-    client.setCACert(rootCACertificate);
+    // client.setCACert(rootCACertificate);
+    client.setInsecure();
     // github redirects you to the latest version if you access ...\latest
     httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     // lets update the given fw binary url with the latest version
@@ -83,7 +84,7 @@ GITHUB_UPDATE_ERROR_t github_update_firmwareUpdate(const char *desired_version) 
     return github_update_firmwareUpdate();
 }
 
-GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
+GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String *ret_version) {
     
     // if wifi not connected, cancel early
     if (WiFi.status() != WL_CONNECTED) {
@@ -95,7 +96,8 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
     WiFiClientSecure *client = new WiFiClientSecure;
 
     if (client) {
-        client->setCACert(rootCACertificate);
+        // client->setCACert(rootCACertificate);
+        client->setInsecure();
 
         // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
         HTTPClient https;
@@ -103,6 +105,7 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
         if (https.begin(*client, URL_FW_VERSION)) {
             // start connection and send HTTP header
             delay(100);
+
             // access the url
             httpCode = https.GET();
 
@@ -111,7 +114,15 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
                 // get updated url after redirect
                 String location = https.getLocation();
                 delay(100);
-                // lets extract the FW version from the url
+
+                // check for  FW version from the url
+                int index_fw_vers = location.indexOf("/releases/tag/");
+                if (index_fw_vers == -1) {
+                    DualSerial.println("error, no tag found");
+                    return GITHUB_UPDATE_ERROR_URL;
+                }
+
+                // extract fw version from redirected url string
                 fw_version = location.substring(location.indexOf("/releases/tag/") + 14);
             } else {
                 DualSerial.print("error in downloading version file: ");
@@ -126,8 +137,8 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
     if (httpCode == HTTP_CODE_FOUND) // if version received
     {
         fw_version.trim();
-        if (!ret_version.isEmpty())
-            ret_version = fw_version;
+        if (ret_version != NULL)
+            *ret_version = fw_version;
 
         // extract firmware numbers
         String fw_version_latest = fw_version;
@@ -147,12 +158,13 @@ GITHUB_UPDATE_ERROR_t github_update_checkforlatest(String ret_version) {
         } else {
             DualSerial.printf("\nDevice running on latest firmware version: v%d.%d.%d\n",
                           FW_VERSION_MAJOR, FW_VERSION_MINOR, FW_VERSION_PATCH);
-            if (!ret_version.isEmpty())
-                ret_version = "0";
+            if (ret_version != NULL)
+                *ret_version = "0";
             return GITHUB_UPDATE_ERROR_NO_UPDATE;
         }
-        if (!ret_version.isEmpty())
-            ret_version = fw_version;
+
+        if (ret_version != NULL)
+            *ret_version = fw_version;
         return GITHUB_UPDATE_ERROR_NO_ERROR;
     }
     return GITHUB_UPDATE_ERROR_HTTP;

@@ -62,8 +62,8 @@ void webfct_get_newversion(AsyncWebServerRequest *request) {
     // check for new FW version
     String new_version;
     String payload;
-    uint8_t retval = github_update_checkforlatest(new_version);
-    if(retval != GITHUB_UPDATE_ERROR_NO_ERROR) {
+    uint8_t retval = github_update_checkforlatest(&new_version);
+    if(retval != GITHUB_UPDATE_ERROR_NO_ERROR && retval != GITHUB_UPDATE_ERROR_NO_UPDATE) {
         ram_log_notify(RAM_LOG_ERROR_GITHUB_UPDATE, retval);
         payload = "1";
     }
