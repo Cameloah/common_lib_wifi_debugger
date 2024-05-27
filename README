@@ -1,3 +1,5 @@
+#How to use this library 
+
 Include the following in your ´main.h´ file
 
 ´´´
@@ -18,3 +20,9 @@ Include the following in your ´main.h´ file
 // #define AP_TIMEOUT                      300000      // 5 min
 #define TIMEOUT_WIFI_CONNECT_MS         5000
 ´´´
+
+
+
+Add the following line to your main platformio.ini file
+
+`extra_scripts = pre:lib/common_lib_wifi_debugger/copy_lib_data.py`
